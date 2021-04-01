@@ -24,11 +24,13 @@ reddit = praw.Reddit(
 pcm = reddit.subreddit('PoliticalCompassMemes') 
 
 # create some empty lists which will be used to store users and their flairs
+user_flair = pd.DataFrame(columns=['user','flair']).to_csv('user_flair.csv', index=False)
 users = []
 flairs = []
+users_unique = []
   
 # loop through new posts on the political compass memes subreddit
-for post in pcm.new( limit=5000):
+for post in pcm.new( limit=10000):
     
     # print the posts title - this can be removed later 
     # print(post.title)
@@ -44,7 +46,7 @@ for post in pcm.new( limit=5000):
         # check if 1) the author is flaired, 2) not already recorded and 3) not private
         if (
              comment.author_flair_text not in [None, ''] and   
-             str(comment.author) not in users and   
+             str(comment.author) not in users_unique and   
              comment.author != None   
             ):
             
@@ -53,23 +55,42 @@ for post in pcm.new( limit=5000):
                 flair = comment.author_flair_text
                 flairs.append(flair)
                 users.append(redditor)
+                users_unique.append(redditor)
 
         comment_queue.extend(comment.replies)  
-        
-        # once we have ideological type for the specified ammount of users end the loop
-        if len(users) >= 10000:
-            break 
+
+        # if the current number of users is in the list is multiple of specified number then:
+        if len(users) == 1000:
+            
+            # convert the user and flair lists to pandas series so we can merge them into a dataframe 
+            user_series = pd.Series(users)
+            flair_series = pd.Series(flairs)
+            # merge the series to create a dataframe where each row list a username and the flaired ideology 
+            user_flair = pd.concat([user_series,flair_series], axis=1)
+            
+            # update the data frame with the current set of users and flairs
+            user_flair.to_csv('user_flair.csv', mode='a', index=False, header=False)
+            
+            # empty the lists 
+            users = []
+            flairs = []
+           
+            
+            # report the current number of unique users whos username and flair we have recorded 
+            print(len(users_unique))
+            
+            # if the the total ammount of observations then stop the process
+            if len(users_unique) >= 10000: # this number is the limit
+                break
+            else:
+                continue
+            break
+            
         
     else:
         continue
     break 
-    
-# conver the user and flair lists to pandas series so we can merge them into a dataframe 
-user_series = pd.Series(users)
-flair_series = pd.Series(flairs)
 
-# merge the series to create a dataframe where each row list a username and the flaired ideology 
-user_flair = pd.concat([user_series,flair_series], axis=1)
-user_flair.columns = ['user','flair']
 
-user_flair.to_csv('user_flair_draft.csv', index=False)
+
+

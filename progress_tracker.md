@@ -20,6 +20,8 @@
     * 4000 users | 293.65 seconds
     * 5000 users | 368.24 seconds
     * 6000 users | 558.32 seconds
+
+* *update:* the time is definitely non-linear since the further we go, the more likely that a comment's author is already in our list. Hence there are dimishing returns to time.
     
 * Updated user_flair_scraper_draft so that it scrapes 1000 user/flair pairs at a time and then adds each user/pair as a row to an existing .csv file. This way, if the computer doing the scraping is turned off while the script is running or something else terminates the script, most of the scraped data will still be saved and available.
 
@@ -37,10 +39,12 @@
 * I will also look into alternative technologies, i.e. pushshift.io
 
 
-* I am currently pursuing option 3. This seems to be doing reasonably well. So far I have collected 22,600 user/flair pairs. I will try option 4 if this doesn't yield sufficient results by the end of the loop. 
-
+* I am currently pursuing option 3. This seems to be doing reasonably well. So far I have collected 60,000+ user/flair pairs. I will try option 4 if this doesn't yield sufficient results by the end of the loop. 
 
 * I have updated the 'user_flair_scraper_draft.py' script in the repo. Now it loops through the top 1000 posts of all time (prior, it looked through new posts). However, since we are limited to 1000 posts it makes sense to look through the top posts since they likely have more comments. For each of these posts it looks through the maximum ammount of comments that PRAW will allow  (1000 I think) and check the author of each comment. If the author is flaired and isn't already in our data set it records the author's username and flair. I also changed the script so that it provides updates on how many user/flair combinations have been saved every 100 user/flairs - this is not a material difference, just cosmetic. Finally, I got rid of the loopbreaker since it's unecessary - the loop will end once the  script has gone through 1000 comments in each of the top 1000 posts of all time. 
+* *update:* accidentally uploaded this file with a different name - working on merging them and getting rid of the duplicate now. 
+
+* I have updated the 'user_history_scraper_draft.py' file. Now it works like the flair scraper in that for every user we pass into the scraping UserData function, it collects this users info, updates the .csv and then deletes that users info before moving onto the next user. This is more effecient in terms of working memory. Further, this means that the process doesn't have to be all done at once. We can simply do it for a set number of users at a time and it will continue to update the file. 
 
 
 

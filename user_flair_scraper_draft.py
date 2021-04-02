@@ -2,15 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 30 19:04:06 2021
-
 @author: michaelkitchener
-
-Alternative way of looping through posts: for post in pcm.top('week', limit=1):
 """
 
 # import the required packages 
 import praw 
-import prawcore 
 import pandas as pd 
 
 # authenticate 
@@ -28,18 +24,23 @@ user_flair = pd.DataFrame(columns=['user','flair']).to_csv('user_flair.csv', ind
 users = []
 flairs = []
 users_unique = []
-  
-# loop through new posts on the political compass memes subreddit
-for post in pcm.new( limit=10000):
+
+# variable to count how many posts we have gone through
+post_count = 1
+
+
+# loop through top posts on the political compass memes subreddit
+for post in pcm.top('all', limit=None):
     
-    # print the posts title - this can be removed later 
-    # print(post.title)
+    # print the post title and the number 
+    print('We are now looking at post number #: ' + str(post_count))
+    print('This post is titled ' + post.title)
     
-    # load up all the (first level?) comments in the post 
+    # load up all the (first level) comments in the post 
     post.comments.replace_more(limit=None)
     comment_queue = post.comments[:]  
 
-    # loop through all the (first level?) comments in the post 
+    # loop through all the comments in the post 
     while comment_queue:
         comment = comment_queue.pop(0)
         
@@ -57,10 +58,11 @@ for post in pcm.new( limit=10000):
                 users.append(redditor)
                 users_unique.append(redditor)
 
+        # this adds the comments replies to the list of comments so we go through all
         comment_queue.extend(comment.replies)  
 
         # if the current number of users is in the list is multiple of specified number then:
-        if len(users) == 1000:
+        if len(users) == 100:
             
             # convert the user and flair lists to pandas series so we can merge them into a dataframe 
             user_series = pd.Series(users)
@@ -74,23 +76,17 @@ for post in pcm.new( limit=10000):
             # empty the lists 
             users = []
             flairs = []
-           
-            
+                       
             # report the current number of unique users whos username and flair we have recorded 
             print(len(users_unique))
-            
-            # if the the total ammount of observations then stop the process
-            if len(users_unique) >= 10000: # this number is the limit
-                break
-            else:
-                continue
-            break
-            
-        
-    else:
-        continue
-    break 
+           
 
+# How many comments does it get from each post? Limit of 1000 too?
+# How can I get it to get new daily posts
 
-
-
+# Changes made:
+    # nowloop through top posts of all time (more comments)
+    # provides an update every 1000posts
+    # got rid of the loopbreaker - it was uncecessary
+    # there are going to be diminishingreturns when looking at user/flaurs through posts
+    # so, collection will get slower and slower 

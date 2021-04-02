@@ -22,3 +22,7 @@
     * 6000 users | 558.32 seconds
     
 * Updated user_flair_scraper_draft so that it scrapes 1000 user/flair pairs at a time and then adds each user/pair as a row to an existing .csv file. This way, if the computer doing the scraping is turned off while the script is running or something else terminates the script, most of the scraped data will still be saved and available.
+
+## Friday April 2
+
+* Started running the updated 'user_flair_scraper_draft.py' scraper. The limit of user observations to record is 500,000. I think it is unlikely that this number will be reached (their may not even be this number of flaired users who have made comments). Fortunately, the script saves every 1000 observations to a .csv so it will be no huge loss if some limiations cause an error and the script to stop running. I plan to keep this running over the break. In the meantime, I will start to get stuck into the literature review. 

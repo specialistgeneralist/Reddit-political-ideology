@@ -35,9 +35,7 @@
    3. Instead of going through the most recent posts, we can loop through the top (most popular) posts of all time (or of the week, month, year, etc.) These will presumably have a greater number of comments on them. As such the unique user/flair pairs yeilded from 1000 of the best posts of all time is likely to be much higher than through looping the 1000 most recent comments.
    4. We can loop through new comment, the top comments (of the week, year, etc.) seperately and then merge the files together. There will undoubtably be duplicates but it will be easy to remove duplicates from the merged data using R or Python.
 
-* I will try various combinations of these possible workarounds and then update the user flair script in this repo.
-* I will also look into alternative technologies, i.e. pushshift.io
-
+* I will also look into alternative technologies, i.e. pushshift.io if this doesn't work.
 
 * I am currently pursuing option 3. This seems to be doing reasonably well. So far I have collected 60,000+ user/flair pairs. I will try option 4 if this doesn't yield sufficient results by the end of the loop. 
 
@@ -46,5 +44,12 @@
 
 * I have updated the 'user_history_scraper_draft.py' file. Now it works like the flair scraper in that for every user we pass into the scraping UserData function, it collects this users info, updates the .csv and then deletes that users info before moving onto the next user. This is more effecient in terms of working memory. Further, this means that the process doesn't have to be all done at once. We can simply do it for a set number of users at a time and it will continue to update the file. 
 
+* I have created an .R file called 'user_footprint_matrix_script.R'. This script takes the output of the user_history_scraper and outputs a dataframe where each row represents a user and each column represents a subreddit. There are different code chunks.
+   1. In the first one, each cell represents how many comments/posts were found in the relevant subreddit for that user.
+   2. each cell representst whether or not the user has commented/posted in that post at all (binary: 0/1).
+   3. each cell represents the total karma (score) of the users' posts/comments in that subreddit.
+   4. each cell represents the average karma (score) of the users' posts/comments in that subreddit.
+
+* I might also create code chunks to have seperate columns for posts and comments. 
 
 

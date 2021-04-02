@@ -36,3 +36,11 @@
 * I will try various combinations of these possible workarounds and then update the user flair script in this repo.
 * I will also look into alternative technologies, i.e. pushshift.io
 
+
+* I am currently pursuing option 3. This seems to be doing reasonably well. So far I have collected 22,600 user/flair pairs. I will try option 4 if this doesn't yield sufficient results by the end of the loop. 
+
+
+* I have updated the 'user_flair_scraper_draft.py' script in the repo. Now it loops through the top 1000 posts of all time (prior, it looked through new posts). However, since we are limited to 1000 posts it makes sense to look through the top posts since they likely have more comments. For each of these posts it looks through the maximum ammount of comments that PRAW will allow  (1000 I think) and check the author of each comment. If the author is flaired and isn't already in our data set it records the author's username and flair. I also changed the script so that it provides updates on how many user/flair combinations have been saved every 100 user/flairs - this is not a material difference, just cosmetic. Finally, I got rid of the loopbreaker since it's unecessary - the loop will end once the  script has gone through 1000 comments in each of the top 1000 posts of all time. 
+
+
+

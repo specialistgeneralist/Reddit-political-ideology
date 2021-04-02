@@ -8,10 +8,7 @@ Created on Tue Mar 30 19:04:06 2021
 
 # import the required packages 
 import praw 
-import prawcore 
 import pandas as pd 
-import timeit
-
 
 # authenticate 
 reddit = praw.Reddit(
@@ -20,15 +17,10 @@ reddit = praw.Reddit(
     user_agent='scrape dawg'
     )
 
-
-# create a blank list to store the rows describing a users comment or post 
-# columns will be:
-# user|interaction_type|title|body|score|time|subreddit
-user_records = []
-
 # this function goes through as much of a users comment and post history as possible (how much??)
 def UserData(user):
 
+    global user_records
     # set up the PRAW redditor object for the user in question    
     redditor = reddit.redditor(user)
     
@@ -62,17 +54,27 @@ def UserData(user):
  
         # add it to the record as an additional 'row'
         user_records.append(row)
+      
+        
+    # turn the list of post and comment info into a datagrame   
+    user_records_data = pd.DataFrame(user_records, 
+                                 columns = ['user','interaction_type','title',
+                                            'body','score','time','subreddit']) 
+    
+    
+    # update the .csv file with tthis users info      
+    user_records_data.to_csv('user_records.csv', mode='a', index=False, header=False)
+    
+    # clear the list for the next user
+    user_records = []
+
+
+# create a blank list to store the rows describing a users comment or post 
+# columns will be:
+# user|interaction_type|title|body|score|time|subreddit
+user_records = []
+user_records_data = pd.DataFrame(columns=['user','interaction', 'title','body',
+                                          'score','time','subreddit']).to_csv('user_records.csv', index=False)
 
 
 # here we can run the UserData function with various flaired users as the input
-# note: i already have the user list in my python environment
-for user in users[0:50]:
-    UserData(user)
-
-# convert the user_records list to a pandas dataframe
-user_records_data = pd.DataFrame(user_records, 
-                                 columns = ['user','interaction_type','title',
-                                            'body','score','time','subreddit']) 
-
-# save user_records_data as a csv
-user_records_data.to_csv('user_records_data.csv', index=False)

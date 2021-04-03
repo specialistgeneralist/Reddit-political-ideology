@@ -52,4 +52,7 @@
 
 * I might also create code chunks to have seperate columns for posts and comments. 
 
+## Saturday April 3
+
+* The user_flair_draft_scraper.py finished going through the top 1000 posts of all time. In total, we scraped 91,000 username and ideology (flair) combinations =.
 

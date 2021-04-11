@@ -54,6 +54,41 @@ We can directly extend this study in many ways with reddit data:
 
 
 
+## Personality, Gender, and Age in the Language of Social Media: The Open-Vocabulary Approach - H. Andrew Schwartz, Johannes C. Eichstaedt,Margaret L. Kern,Lukasz Dziurzynski,Stephanie M. Ramones,Megha Agrawal,Achal Shah,Michal Kosinski,David Stillwell,Martin E. P. Seligman,Lyle H. Ungar
+
+See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
+
+**Abstract:** *We analyzed 700 million words, phrases, and topic instances collected from the Facebook messages of 75,000 volunteers, who also took standard personality tests, and found striking variations in language with personality, gender, and age. In our open-vocabulary technique, the data itself drives a comprehensive exploration of language that distinguishes people, finding connections that are not captured with traditional closed-vocabulary word-category analyses. Our analyses shed new light on psychosocial processes yielding results that are face valid (e.g., subjects living in high elevations talk about the mountains), tie in with other research (e.g., neurotic people disproportionately use the phrase ‘sick of’ and the word ‘depressed’), suggest new hypotheses (e.g., an active life implies emotional stability), and give detailed insights (males use the possessive ‘my’ when mentioning their ‘wife’ or ‘girlfriend’ more often than females use ‘my’ with ‘husband’ or 'boyfriend’). To date, this represents the largest study, by an order of magnitude, of language and personality.*
+
+* Open-vocabulary analysis; looks at distinctive words and phrases as functions of traits by corellating individuals language used with their attributes. Rather than considering relationships between a pre-determined set of words and phrases and traits (closed-vocabulary analysis), the data itself drives the set of words and phrases which are linked to traits. 
+* Differential language analysis is usued to find 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

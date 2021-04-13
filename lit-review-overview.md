@@ -12,6 +12,7 @@ The literature review could look at research in several different areas:
 ## Private traits and attributes are predictable from digital records of human behavior - Michal Kosinski, David Stillwell, and Thore Graepel
 
 See: https://www.pnas.org/content/110/15/5802
+
 Article has the following tags:
 social networks | computational social science | machine learning | big data | data mining | psychological assessment
 
@@ -61,15 +62,43 @@ See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
 **Abstract:** *We analyzed 700 million words, phrases, and topic instances collected from the Facebook messages of 75,000 volunteers, who also took standard personality tests, and found striking variations in language with personality, gender, and age. In our open-vocabulary technique, the data itself drives a comprehensive exploration of language that distinguishes people, finding connections that are not captured with traditional closed-vocabulary word-category analyses. Our analyses shed new light on psychosocial processes yielding results that are face valid (e.g., subjects living in high elevations talk about the mountains), tie in with other research (e.g., neurotic people disproportionately use the phrase ‘sick of’ and the word ‘depressed’), suggest new hypotheses (e.g., an active life implies emotional stability), and give detailed insights (males use the possessive ‘my’ when mentioning their ‘wife’ or ‘girlfriend’ more often than females use ‘my’ with ‘husband’ or 'boyfriend’). To date, this represents the largest study, by an order of magnitude, of language and personality.*
 
 * Open-vocabulary analysis; looks at distinctive words and phrases as functions of traits by corellating individuals language used with their attributes. Rather than considering relationships between a pre-determined set of words and phrases and traits (closed-vocabulary analysis), the data itself drives the set of words and phrases which are linked to traits. 
-* Differential language analysis is usued to find 
+* Differential language analysis (an open-vocabulary methodology) is used to find bits of language in social media posts that are indicative of different traits. 
+* Words, phrases and topics are correlated with traits. 
+
+* Personality characterised by the five factor model. 
+
+* Overview of closed-vocabulary techniques to gain insight into psychology/other domains:
+* Typical approach to analyzing language: count word useage for an apriori chosen set (words within a set contribute to score for that set).
+* Commonly used typical approach is the linguistic inquiry and word count LIWC; it contains 64 different sets (categories of language). 
+* This has a long history in psychology: Pennebaker & King analysed the diaries, writting assignments, etc. of people with different personalities and found the following:
+    * agreeable people use more articles
+    * neurotic people use more negative emotion words
+* People have explored frequencies between democratic vs. republican speeches using Bayesian models w/ regularization and shrinkage (priors on word use).
+
+* Research has also been done seeking to predict psychological (and other) outcomes based on language use:
+* These predictive owrks are typicallynot concerned with 'individually distinguishing pieces of language' and are instead focussed on predictive accuracy.
+* Words that are highly colinear with other words typically have htier weights penalised. 
+* This paper is not soley focussed on a preditctive model and wishes to understand all the words that are correlated with personality in order to gain insight into personality types.
+
+![image](https://user-images.githubusercontent.com/81718822/114502301-ea874000-9c6e-11eb-85a1-3885ada90196.png)
+
+* From a set of social media messages they extract 'linguistic features' including both words and phrases (sequences of length 1-3) (24,530 features) and topics (derived from words using unsupervised learning) (500).
+* Then each linguistic features is regressed on each dependent variable (trait).
+
+* Closed vocabulary: counting words in a priori defined categories of language. 
+
+$P_{cs} = \frac{\sum_{word \in category} freq_{ws}}{{\sum_{word \in vocab_s} freq_{ws}} $ 
 
 
 
+DIRECT QUOTES:
+
+"One should always be careful generalizing new results outside of the domain they were found as language is often dependent on context [40]"
+
+"In other works, ideologies of political figures (i.e. conservative to liberal) have been predicted based on language using supervised techniques [58] or unsupervised inference of ideological space [59], [60]."
 
 
-
-
-
+* Predictive model of ideology could form the basis of large scale inquiries into the language used by people of different ideologies: "Burger et al. scaled up the gender prediction over 184,000 Twitter authors by using automatically guessed gender based-on gender-specific keywords in profiles." 
 
 
 

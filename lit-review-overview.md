@@ -86,8 +86,17 @@ See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
 * Then each linguistic features is regressed on each dependent variable (trait).
 
 * Closed vocabulary: counting words in a priori defined categories of language. 
+* percentage of participants word in a given category is equal to the ratio of:
+  * sum of the times ths subject has mentioned a word in the category AND
+  * sum of frequency of all words used by the subject
+* OLS is used to analyse the linkage between word category use and subject traits: trait ~ LIWC_1 + LIWC_2 + .... + controlling covariates(i.e. gender, age)
+* Coeffecient of target explanatory variable is considered to represent the strength of the relationship. 
 
-$P_{cs} = \frac{\sum_{word \in category} freq_{ws}}{{\sum_{word \in vocab_s} freq_{ws}} $ 
+* Differential language analysis:
+* Linguistic feature extraction:
+* words determined by tokenizer. 
+* phrases determined to PMI: log of ratio of joint probability of phrase (p(word1, word2, word 3) ?) and. indpendent probability of the phrase (p(word1) * p(word2) * p(word3))
+* 
 
 
 

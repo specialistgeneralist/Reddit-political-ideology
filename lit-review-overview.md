@@ -95,7 +95,8 @@ See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
 * Differential language analysis:
 * Linguistic feature extraction:
 * words determined by tokenizer. 
-* phrases determined to PMI: log of ratio of joint probability of phrase (p(word1, word2, word 3) ?) and. indpendent probability of the phrase (p(word1) * p(word2) * p(word3))
+* phrases determined to PMI: log of ratio of joint probability of phrase (p(word1, word2, word 3) ?) and. indpendent probability of the phrase (p(word1)*p(word2)* p(word3))
+* phrases with PMI > 2*length (length. := number of words in phrase) were kept
 * 
 
 
@@ -109,13 +110,7 @@ DIRECT QUOTES:
 
 * Predictive model of ideology could form the basis of large scale inquiries into the language used by people of different ideologies: "Burger et al. scaled up the gender prediction over 184,000 Twitter authors by using automatically guessed gender based-on gender-specific keywords in profiles." 
 
-
-
-
-
-
-
-
+* Might be working using this open vocab approach to exploring tthe differences betwteen political groups.
 
 
 

@@ -99,6 +99,7 @@ See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
 * phrases with PMI > 2*length (length. := number of words in phrase) were kept
 * 
 
+## FINISH THIS OFF!
 
 
 DIRECT QUOTES:
@@ -113,9 +114,35 @@ DIRECT QUOTES:
 * Might be working using this open vocab approach to exploring tthe differences betwteen political groups.
 
 
+## Personality and politics: The role of the HEXACO model of personality in predicting ideology and voting. - Antonio Chirumbolo, Luigi Leone
+
+See: https://www.sciencedirect.com/science/article/pii/S0191886910001182
+
+**Abstract:** *This paper investigates the impact of the HEXACO model of personality structure in predicting political ideology and voting. Five-hundred and seventeen participants provided responses for measures of the HEXACO and the Five Factor Models, ideological orientation, and past voting. Results showed that Conscientiousness was linked to voting for right-wing parties, whereas Honesty–Humility, Agreeableness and Openness were related to voting for left-wing parties. Ideological orientation mediated the relationship between personality traits and voting. Hierarchical tests indicated that the HEXACO outperformed the Five Factor Model in predicting ideological orientation.*
+
+* Using a sample of 517 Italian adults, Chirumbolo and Leone demonstrate that the HEXACO model of personality and the Five Factor model of personality can be used to predict, or rather,  explain variation in,  an individual's ideology and voting behaviour. They note that a hierarchical regression model where HEXACO traits are added as additional predictors to the Five Factor Model contributes to a substantial increase in explained variance whilst the converse does not. 
+* They found that honesty-humility, agreeableness and openess were more associated with left wing ideologies whilst consciensiousness was associated with conservative ideologies. Simmilar results were found for voting behaviour.
+* Note that studies into psychological the determinatns of ideology are plagued by poor sample sizes and lack of statistical power - studies have demonstrated inconsistent results. 
+
+* Ideology was modelled by the response to a 7-point q uestionaire with values ranging from 1: extreme left, to 7: extreme right. 
+* Voting modelled as a binary variable (left wing or right wing vote) 
 
 
+## Political conservatism as motivated social cognition - Jost, J. T., Glaser, J., Kruglanski, A. W., & Sulloway, F. J. 
 
+See:https://psycnet.apa.org/record/2003-00782-003
+
+**Abstract:** *Analyzing political conservatism as motivated social cognition integrates theories of personality (authoritarianism, dogmatism-intolerance of ambiguity), epistemic and existential needs (for closure, regulatory focus, terror management), and ideological rationalization (social dominance, system justification). A meta-analysis (88 samples, 12 countries, 22,818 cases) confirms that several psychological variables predict political conservatism: death anxiety (weighted mean r=.50); system instability (.47); dogmatism-intolerance of ambiguity (.34); openness to experience (-.32); uncertainty tolerance (-.27); needs for order, structure, and closure (.26); integrative complexity (-.20); fear of threat and loss (.18); and self-esteem (-.09). The core ideology of conservatism stresses resistance to change and justification of inequality and is motivated by needs that vary situationally and dispositionally to manage uncertainty and threat. (PsycINFO Database Record (c) 2016 APA, all rights reserved)*
+
+* Jost etc. perform a meta-analysis of research into conservatism as a function of social cognition.
+* They find that the following psychological traits have predictive power for conservatism: death anxiety, system instability, dogmatism-intolerance of ambiguity, openess to experience, uncertainity tolerance, needs for order, structure and closure, integrative compelxity, fear of threat and loss and self-esteem.
+
+* Make sure to cover definitons of all the above traits. 
+* These hobbies/interests may be reflective of these traits (i.e. people with trait X like hobby Y) providing a mechanism through which ideology is linked to digital footprint on reddit.
+
+## Openness to Experience and Boundaries in the Mind: Relationships with Cultural and Economic Conservative Beliefs - Alain Van Hiel  Ivan Mervielde
+
+See: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.0022-3506.2004.00276.x
 
 
 

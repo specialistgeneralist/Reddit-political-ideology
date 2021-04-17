@@ -97,7 +97,7 @@ See: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073791
 * words determined by tokenizer. 
 * phrases determined to PMI: log of ratio of joint probability of phrase (p(word1, word2, word 3) ?) and. indpendent probability of the phrase (p(word1)*p(word2)* p(word3))
 * phrases with PMI > 2*length (length. := number of words in phrase) were kept
-* 
+
 
 ## FINISH THIS OFF!
 
@@ -144,7 +144,14 @@ See:https://psycnet.apa.org/record/2003-00782-003
 
 See: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.0022-3506.2004.00276.x
 
+**Abstract:** *The present research investigates whether Openness to Experience and Boundaries in the mind are related to conservatism. In the first study, significant relationships between several scales of the Boundaries in the mind questionnaire and indicators of conservative beliefs were obtained in an adult sample (N=78) as well as in a sample of political party activists (N=44). In the second study, these negative relationships between conservatism and thin boundaries were replicated in an adult sample (N=225). Moreover, two dimensions representing Boundaries in the mind were identified, one positively related to Openness to Experience and negatively to conservatism and the second showing high positive correlations with Neuroticism. The exceptionally strong correlations between conservatism and the Boundaries in the mind facet scales Opinions about organizations, Opinions about beauty, truth, Edges, lines, clothing and Opinions about peoples, nations, groups are discussed, as well as the weak relationships between economic conservatism and Openness to Experience.*
 
+* Van Hiel and Mervielde illustrate that the results of Hartmann's Boundaries questionnaire can be used to predict conservatism.
+
+
+
+
+* reserach is an extension as it doesn't focus on 'conservative/liberal' dichotomy but instead contains 2-axis.
 
 
 

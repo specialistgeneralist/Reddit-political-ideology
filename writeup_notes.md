@@ -50,3 +50,5 @@ Ideology can certainly change over time. However, the ‘r/PoliticalCompassMemes
 [][][] risk users ideology has changed over time with our data collection [][][]
 
 [][] add notes  from meeting [][][]
+
+[][] sample non-rep - people post alot and may post in politically centered forums [][]

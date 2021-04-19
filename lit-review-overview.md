@@ -113,6 +113,7 @@ DIRECT QUOTES:
 
 * Might be working using this open vocab approach to exploring tthe differences betwteen political groups.
 
+# PSYCH - DETERMINANTS OF PERSONALITY
 
 ## Personality and politics: The role of the HEXACO model of personality in predicting ideology and voting. - Antonio Chirumbolo, Luigi Leone
 
@@ -147,11 +148,36 @@ See: https://onlinelibrary.wiley.com/doi/abs/10.1111/j.0022-3506.2004.00276.x
 **Abstract:** *The present research investigates whether Openness to Experience and Boundaries in the mind are related to conservatism. In the first study, significant relationships between several scales of the Boundaries in the mind questionnaire and indicators of conservative beliefs were obtained in an adult sample (N=78) as well as in a sample of political party activists (N=44). In the second study, these negative relationships between conservatism and thin boundaries were replicated in an adult sample (N=225). Moreover, two dimensions representing Boundaries in the mind were identified, one positively related to Openness to Experience and negatively to conservatism and the second showing high positive correlations with Neuroticism. The exceptionally strong correlations between conservatism and the Boundaries in the mind facet scales Opinions about organizations, Opinions about beauty, truth, Edges, lines, clothing and Opinions about peoples, nations, groups are discussed, as well as the weak relationships between economic conservatism and Openness to Experience.*
 
 * Van Hiel and Mervielde illustrate that the results of Hartmann's Boundaries questionnaire can be used to predict conservatism.
+* Some results expected, i.e. conservativism can be predicted by preference for clearly defined social structures but also some 'unexpected' results: conservatism positively associated with a preference for art with blurred edges and soft lines. 
+* Looks at cultural conservatism and economic conservatism (in general, weaker correlations for economic conservatism with openess)
+
+## Personality correlates of party preference: The Big Five in five big European countries - MicheleVecchioneaHaraldSchoenbJosé Luis GonzálezCastrocJanCieciuchdVassilisPavlopouloseGian VittorioCapraraa
+
+See: https://www.sciencedirect.com/science/article/pii/S0191886911002911
+
+**Abstract:** *The Big Five Model was used to assess the role of personality traits in orienting voting choice across five European countries (n = 1288). Findings from Italy, Spain, Germany, Greece, and Poland showed that the Big Five were linked to party preference in theoretically consistent ways. Traits had substantial effects on voting, whereas the socio-demographic characteristics of gender, age, income, and educational level had weaker influences. In each country, voters’ traits are seemingly congruent with the policies of their preferred party. The Openness trait has been shown to be the most generalizable predictor of party preference across the examined cultures. Conscientiousness was also a valid predictor, although its effect was less robust and replicable. Similarities and differences across countries were discussed and linked to the nature of the respective political discourses.*
+
+* More powerful predictor than demographic traits
+* Openess predicts liberal and left-wing views, conscientiousness predicts conservative and right-wing political views.
+* "In a nutshell, vote choice is rooted in personality traits since citizens vote for parties whose ideological and policy stances fit their ideological preferences, that in turn are affected by basic personality dispositions."
+* Openness - tolerance of new ideas, relates negatively with preferecnes for hierarhcy and oscial conformity - expected to increased likelihood of left wing.
+* Consceintiousness - adherence to social rules, predicted to associated with support of right wing parties.
+* Shows relationships between voting and demographics, gender, age and education are shown to be significantly correlated in some but not all countries. Openess correlated in most countries, conscientiousness only in germany.
+* Fit logistic regression (hierarchical, demographic -> psychometric), change in pseudo R^2 due to adding traits varies a lot.
+* Multinomial logistic regression used for third parties.
+* Openness pretty robustly predicts left wing votes as does conscientiousness.
+* end result: personality can be linked to voting in theoretically consistent manner,  socio-demographic features largely insignificant. 
+* "Taken together, these findings suggest that the Big Five factors of personality may underlie citizens’ support for different parties, based on the policy issues they advocated."
+
+
+* Conscientiousness and Openess are typically the most powerful predictors.
+
+* Samples of conveniance 
 
 
 
 
-* reserach is an extension as it doesn't focus on 'conservative/liberal' dichotomy but instead contains 2-axis.
+* reserach is an extension as it doesn't focus on 'conservative/liberal' dichotomy but instead contains 2-axis (except Van Hiel and Mervielde).
 
 
 

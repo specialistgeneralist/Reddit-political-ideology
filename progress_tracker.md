@@ -54,5 +54,11 @@
 
 ## Saturday April 3
 
-* The user_flair_draft_scraper.py finished going through the top 1000 posts of all time. In total, we scraped 91,000 username and ideology (flair) combinations =.
+* The user_flair_draft_scraper.py finished going through the top 1000 posts of all time. In total, we scraped 91,000 username and ideology (flair) combinations.
 
+## Tue May 4
+
+* Last few days spent creating the reserach proposal and accompanying slides.
+* See project proposal for an outline of the project's intended contribution
+* Have been continuing with the literature review.
+* Created script to clean up the flair datat (merge duplicate flair types for the same ideology) and report descriptive stats for ideology + viz

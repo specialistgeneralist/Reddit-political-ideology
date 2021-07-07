@@ -1,3 +1,5 @@
+# NOTE: this is now defunct - data_manipulator_complete.py has assumed the function of this script
+
 library(tidyverse)
 setwd('~/Desktop/WORK/Monash/Thesis/Data collection')
 

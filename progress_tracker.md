@@ -61,4 +61,12 @@
 * Last few days spent creating the reserach proposal and accompanying slides.
 * See project proposal for an outline of the project's intended contribution
 * Have been continuing with the literature review.
-* Created script to clean up the flair datat (merge duplicate flair types for the same ideology) and report descriptive stats for ideology + viz
+* Created script to clean up the flair data (merge duplicate flair types for the same ideology) and report descriptive stats for ideology + viz
+
+## Tue Jul 7
+
+* I have started writting up a draft of some sections of the final decision paper, the introduction, the literature review, an explanation of the data, etc.
+* I have also created a script to transform the full record of user interactions into a 'user interaction matrix' (non-trivial as just trying to pivot the data is impossible due to limitations with working memory) - uploaded as 'data_manipulator_complete.py'
+* I am playing around with different models on a small subset of the data ~3.5k observations, nothing amazing so far
+* Next, I will go through the script to scrape user interactions and check whether or not has 'censored' any data.
+* I will also investigate ways to scrape the full list of user comments 

@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 # load user-history data 
-user_records = pd.read_csv("/Users/pkitc/Desktop/Michael Honours Stuff/user_records_complete.csv")
+user_records = pd.read_csv("/Users/pkitc/Desktop/Michael/Thesis/data/user_records_complete.csv")
 # create frequency column
 user_records['freq'] = 1
 # summarise data
@@ -31,32 +31,40 @@ for chunk in chunker:
     print(counter)
     counter += 1
 
+# remove obsolete variables and data to free up memory
+del chunk, chunk_to_add, chunker, counter, user_records
+
+# combine all chunks
 union = pd.concat(chunker_pivoted)
 
-del chunk, chunk_to_add, chunker, chunker_pivoted, counter, user_records
+# remove this to free up memory
+del chunker_pivoted
 
 
 # check that this has worked as intended 
 union.sum(axis=0,skipna=True)
 # we expect this to be false as one users post/comment history may be split over chunks
 union.index.is_unique
-# we group by the index (username) and combine records for duplicate entries of the same user 
+# we group by the index (username) and combine records for duplicate entries of the same user - this can cause kernel to restart 
 union = union.groupby(union.index).sum()
 # we now expect this to be true 
 union.index.is_unique
 
 # we now load the user_flair and modify it so that it uses usernames as its index
-user_flair = pd.read_csv("/Users/pkitc/Desktop/Michael Honours Stuff/user_flair.csv")
+user_flair = pd.read_csv("/Users/pkitc/Desktop/Michael/Thesis/data/user_flair.csv")
 user_flair.index = user_flair['user']
 user_flair.drop('user', inplace=True,axis=1)
+user_flair.rename(columns={"flair":"user.flair"}, inplace = True)
 
 # merge ideology labels data with the digital footprint data 
 data = user_flair.join(union, how="inner")
+
+# remove union and user_flair to free up memory
+del union, user_flair
+
+data.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
 
 ##############################################################################
 #                           END OF SCRIPT
 ##############################################################################
 
-
-
-union.groupby(union.index).sum()

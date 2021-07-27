@@ -4,13 +4,11 @@
 
 # Load the necessary packages
 import pandas as pd
-import numpy as np
-from random import sample 
 import scipy.sparse
 from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import cross_validate, GridSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split, ShuffleSplit
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import LinearSVC
@@ -57,23 +55,11 @@ y.replace(':authright: - AuthRight','authright', inplace=True)
 
 y.reset_index(drop = True, inplace=True)
 
-# possibly to delete
-y = np.array(y).reshape(-1,1)
 
 # Split data into train andtest sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 y_train.reset_index(drop=True, inplace=True)
 y_test.reset_index(drop=True, inplace=True)
-
-# Split indices from training data into a true training set and a validation set
-test_indices = np.array(sample(range(0, len(y_train)), round(0.2*len(y_train))))
-
-train_indices = []
-for x in range(0, len(y_train)):
-          if x not in test_indices: train_indices.append(x)
-train_indices = np.array(train_indices)
-          
-custom_cv = zip(train_indices, test_indices)
 
 # Data is now ready for modelling 
 
@@ -89,6 +75,9 @@ accuracy_log = {}
 # Set up object for truncated SVD
 svd = TruncatedSVD(n_components = 1000, random_state = 0)
 
+# Set up custom train/validate split
+custom_cv = ShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
+
 ################################################################################
 # ZeroR -- baseline
 ################################################################################
@@ -97,7 +86,7 @@ svd = TruncatedSVD(n_components = 1000, random_state = 0)
 zero_r = DummyClassifier(strategy = "most_frequent")
 
 # Fit the model
-zero_r.fit(X[train_indices], y[train_indices])
+zero_r.fit(X_train, y_train)
 
 # Record best model results 
 zero_r_predict = zero_r.predict(X_test)
@@ -122,7 +111,7 @@ ovr_logreg_pipeline = Pipeline(steps = [
 ])
 
 # Fit the model
-ovr_logreg_pipeline.fit(X[train_indices], y[train_indices])
+ovr_logreg_pipeline.fit(X_train, y_train)
 
 # Record best model results 
 ovr_logreg_predict = ovr_logreg_pipeline.predict(X_test)
@@ -182,7 +171,7 @@ multinomial_pipeline = Pipeline(steps = [
 ])
 
 # Fit the model
-multinomial_pipeline.fit(X[train_indices], y[train_indices])
+multinomial_pipeline.fit(X_train, y_train)
 
 # Record the best model results 
 multinomial_predict = multinomial_pipeline.predict(X_test)
@@ -214,7 +203,7 @@ multinomial_l1_param_grid = {
 multinomial_l1_search = GridSearchCV(multinomial_l1_pipeline,
                                     multinomial_l1_param_grid,
                                     n_jobs =-1,
-                                    scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                                    scoring = 'accuracy',
                                     cv = custom_cv)
 
 multinomial_l1_search.fit(X_train, y_train)
@@ -248,13 +237,13 @@ rf_pipeline = Pipeline(steps =[
 # Set up grid for hyperparameter optimization
 rf_param_grid = {
   'rf__min_samples_split': [5, 10, 20],
-  'rf__min_samples_leaf ': [5, 10, 20]
+  'rf__min_samples_leaf': [5, 10, 20]
 }
 
 rf_search = GridSearchCV(rf_pipeline,
                          rf_param_grid,
                          n_jobs =-1,
-                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         scoring = 'accuracy',
                          cv = custom_cv)
 
 rf_search.fit(X_train, y_train)
@@ -296,7 +285,7 @@ ovr_rf_param_grid = {
 ovr_rf_search = GridSearchCV(rf_pipeline,
                          ovr_rf_param_grid,
                          n_jobs =-1,
-                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         scoring = 'accuracy',
                          cv = custom_cv)
 
 ovr_rf_search.fit(X_train, y_train)
@@ -312,7 +301,7 @@ accuracy_log['ovr_rf'] = accuracy_score(y_test, ovr_rf_predict)
 adaboost = AdaBoostClassifier(
     n_estimators = 500,
     random_state = 0,
-    algorithim = 'SAMME')
+    algorithm= 'SAMME')
 
 # Set up Pipeline
 adaboost_pipeline = Pipeline(steps =[
@@ -327,8 +316,8 @@ adaboost_param_grid = {
 
 adaboost_search = GridSearchCV(adaboost_pipeline,
                          adaboost_param_grid,
-                         n_jobs =-1,
-                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         n_jobs = -1,
+                         scoring = 'accuracy',
                          cv = custom_cv)
 
 adaboost_search.fit(X_train, y_train)
@@ -336,6 +325,39 @@ adaboost_search.fit(X_train, y_train)
 # Record best model results
 adaboost_predict = adaboost_search.predict(X_test)
 accuracy_log['adaboost'] = accuracy_score(y_test, adaboost_predict)
+
+
+################################################################################
+# OVR ADA Boost 
+################################################################################
+
+ovr_adaboost = OneVsRestClassifier(AdaBoostClassifier(
+  n_estimators = 500,
+  random_state = 0,
+  algorithim = 'SAMME'))
+
+# Set up Pipeline
+ovr_adaboost_pipeline = Pipeline(steps =[
+  ('svd', svd),
+  ('ovr_adaboost', ovr_adaboost)
+])
+
+# Set up grid for hyperparameter optimization
+ovr_adaboost_param_grid = {
+  'ovr_adaboost__learning_rate': [0.001, 0.01, 0.1,1]
+}
+
+ovr_adaboost_search = GridSearchCV(ovr_adaboost_pipeline,
+                               ovr_adaboost_param_grid,
+                               n_jobs =-1,
+                               scoring = 'accuracy',
+                               cv = custom_cv)
+
+ovr_adaboost_search.fit(X_train, y_train)
+
+# Record best model results
+ovr_adaboost_predict = ovr_adaboost_search.predict(X_test)
+accuracy_log['ovr_adaboost'] = accuracy_score(y_test, ovr_adaboost_predict)
 
 ################################################################################
 # OVR Linear SVC
@@ -362,7 +384,7 @@ svc_param_grid = {
 svc_search = GridSearchCV(svc_pipeline,
                          svc_param_grid,
                          n_jobs =-1,
-                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         scoring = 'accuracy',
                          cv = custom_cv)
 
 svc_search.fit(X_train, y_train)
@@ -370,6 +392,4 @@ svc_search.fit(X_train, y_train)
 # Record best model results
 svc_predict = svc_search.predict(X_test)
 accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
-
-
 

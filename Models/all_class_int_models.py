@@ -1,26 +1,36 @@
-
-
 ################################################################################
 # Preparing data
 ################################################################################
 
 # Load the necessary packages
-import pandas as pd 
+import pandas as pd
+import numpy as np
+from random import sample 
 import scipy.sparse
 from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_validate, GridSearchCV, train_test_split
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import LinearSVC
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 # Load data
 data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
 
+# Remove explicitly political columns
+
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+
 # Remove columns with insufficient interaction 
 
-
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 
 # Seperate data into target/features and make features sparse
 features = list(data.columns)
@@ -45,48 +55,65 @@ y.replace(':auth: - AuthCenter','authcenter', inplace=True)
 y.replace(':authleft: - AuthLeft','authleft', inplace=True)
 y.replace(':authright: - AuthRight','authright', inplace=True)
 
+y.reset_index(drop = True, inplace=True)
+
+# possibly to delete
+y = np.array(y).reshape(-1,1)
+
+# Split data into train andtest sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+y_train.reset_index(drop=True, inplace=True)
+y_test.reset_index(drop=True, inplace=True)
+
+# Split indices from training data into a true training set and a validation set
+test_indices = np.array(sample(range(0, len(y_train)), round(0.2*len(y_train))))
+
+train_indices = []
+for x in range(0, len(y_train)):
+          if x not in test_indices: train_indices.append(x)
+train_indices = np.array(train_indices)
+          
+custom_cv = zip(train_indices, test_indices)
+
 # Data is now ready for modelling 
 
 ################################################################################
 ################################################################################
-# Modelling
+# Modelling 
 ################################################################################
 ################################################################################
 
+# Set up dictionary to store results 
+accuracy_log = {}
+
 # Set up object for truncated SVD
-svd = TruncatedSVD(n_components = 1000,
-                   random_state = 0)
+svd = TruncatedSVD(n_components = 1000, random_state = 0)
 
 ################################################################################
 # ZeroR -- baseline
 ################################################################################
+
 # Set up ZeroR classifier 
-ZeroR = DummyClassifier(strategy = "most_frequent")
+zero_r = DummyClassifier(strategy = "most_frequent")
 
-# Compute 5-fold CV metrics
-ZeroR_CV = cross_validate(
-  ZeroR,
-  X,
-  y,
-  cv = 5,
-  scoring = ('accuracy')
-)
+# Fit the model
+zero_r.fit(X[train_indices], y[train_indices])
 
-# Report 5-fold CV
-print('baseline accuracy:')
-print(ZeroR_CV ['test_accuracy'].mean())
-
+# Record best model results 
+zero_r_predict = zero_r.predict(X_test)
+accuracy_log['zero_r'] = accuracy_score(y_test, zero_r_predict)
 
 ################################################################################
 # OVR Logistic regression - no penalty
 ################################################################################
 
 # Set up OVR logistic regression object
-ovr_logreg = LogisticRegression(solver = 'lbfgs',
+ovr_logreg = LogisticRegression(solver = 'saga',
                                 max_iter = 1000,
                                 class_weight = 'balanced',
                                 penalty = 'none',
-                                multi_class = 'ovr')
+                                multi_class = 'ovr',
+                                n_jobs = -1)
 
 # Set up Pipeline 
 ovr_logreg_pipeline = Pipeline(steps = [
@@ -94,35 +121,24 @@ ovr_logreg_pipeline = Pipeline(steps = [
   ('ovr_logreg', ovr_logreg)
 ])
 
-# Compute 5-fold CV metrics
-ovr_logreg_CV = cross_validate(
-  ovr_logreg_pipeline,
-  X,
-  y,
-  cv = 5,
-  scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
-  n_jobs = -1
-)
+# Fit the model
+ovr_logreg_pipeline.fit(X[train_indices], y[train_indices])
 
-# Report 5-fold CV
-print('accuracy:')
-print(ovr_logreg_CV['test_accuracy'].mean())
-print('ROC-AUC:')
-print(ovr_logreg_CV['test_roc_auc_ovr'].mean())
-print('ROC-AUC:')
-print(ovr_logreg_CV['test_roc_auc_ovr_weighted'].mean())
+# Record best model results 
+ovr_logreg_predict = ovr_logreg_pipeline.predict(X_test)
+accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
 
 ################################################################################
 # OVR Logistic regression - Lasso penalty
 ################################################################################
 
 # Set up OVR logistic regression object
-ovr_logreg_l1 = LogisticRegression(solver = 'lbfgs',
+ovr_logreg_l1 = LogisticRegression(solver = 'saga',
                                 max_iter = 1000,
                                 class_weight = 'balanced',
                                 penalty = 'l1',
-                                C = 0.01,
-                                multi_class = 'ovr')
+                                multi_class = 'ovr',
+                                n_jobs = -1)
 
 # Set up Pipeline 
 ovr_logreg_l1_pipeline = Pipeline(steps = [
@@ -130,23 +146,83 @@ ovr_logreg_l1_pipeline = Pipeline(steps = [
   ('ovr_logreg_l1', ovr_logreg_l1)
 ])
 
-# Compute 5-fold CV metrics
-ovr_logreg_l1_CV = cross_validate(
-  ovr_logreg_l1_pipeline,
-  X,
-  y,
-  cv = 5,
-  scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
-  n_jobs = -1
-)
+# Set up grid for hyperparameter optimization
+ovr_logreg_l1_param_grid = {
+    'ovr_logreg_l1__C': [0.001, 0.01, 0.1]
+    }
 
-# Report 5-fold CV
-print('accuracy:')
-print(ovr_logreg_l1_CV['test_accuracy'].mean())
-print('ROC-AUC:')
-print(ovr_logreg_l1_CV['test_roc_auc_ovr'].mean())
-print('ROC-AUC:')
-print(ovr_logreg_CV['test_roc_auc_ovr_weighted'].mean())
+ovr_logreg_l1_search = GridSearchCV(ovr_logreg_l1_pipeline,
+                      ovr_logreg_l1_param_grid,
+                      n_jobs =-1,
+                      scoring = 'accuracy',
+                      cv = custom_cv)
+
+ovr_logreg_l1_search.fit(X_train, y_train)
+
+# Record best model results 
+ovr_logreg_l1_predict = ovr_logreg_l1_search.predict(X_test)
+accuracy_log['ovr_logreg_l1'] = accuracy_score(y_test, ovr_logreg_l1_predict)
+
+################################################################################
+# Multinomial Logistic regression - no penalty
+################################################################################
+
+# Set up multinomial logistic regression object
+multinomial = LogisticRegression(solver = 'saga',
+                                max_iter = 1000,
+                                class_weight = 'balanced',
+                                penalty = 'none',
+                                multi_class = 'multinomial',
+                                n_jobs = -1)
+
+# Set up Pipeline 
+multinomial_pipeline = Pipeline(steps = [
+  ('svd', svd),
+  ('multinomial', multinomial)
+])
+
+# Fit the model
+multinomial_pipeline.fit(X[train_indices], y[train_indices])
+
+# Record the best model results 
+multinomial_predict = multinomial_pipeline.predict(X_test)
+accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
+
+################################################################################
+# Multinomial Logistic regression - Lasso penalty
+################################################################################
+
+# Set up multinomial logistic regression object
+multinomial_l1 = LogisticRegression(solver = 'saga',
+                                max_iter = 1000,
+                                class_weight = 'balanced',
+                                penalty = 'l1',
+                                multi_class = 'multinomial',
+                                n_jobs = -1)
+
+# Set up Pipeline
+multinomial_l1_pipeline = Pipeline(steps = [
+  ('svd', svd),
+  ('multinomial_l1', multinomial_l1)
+])
+
+# Set up grid for hyperparameter optimization
+multinomial_l1_param_grid = {
+  'multinomial_l1__C': [0.001, 0.01, 0.1]
+}
+
+multinomial_l1_search = GridSearchCV(multinomial_l1_pipeline,
+                                    multinomial_l1_param_grid,
+                                    n_jobs =-1,
+                                    scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                                    cv = custom_cv)
+
+multinomial_l1_search.fit(X_train, y_train)
+
+# Record best model results
+multinomial_l1_predict = multinomial_l1_search.predict(X_test)
+accuracy_log['multinomial_l1'] = accuracy_score(y_test, multinomial_l1_predict)
+
 
 ################################################################################
 # Random Forest
@@ -169,23 +245,97 @@ rf_pipeline = Pipeline(steps =[
   ('rf', rf)
 ])
 
-# Compute 5-fold CV metrics 
-rf_CV = cross_validate(
-  rf_pipeline,
-  X,
-  y,
-  cv = 5,
-  scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
-  n_jobs = -1
-)
+# Set up grid for hyperparameter optimization
+rf_param_grid = {
+  'rf__min_samples_split': [5, 10, 20],
+  'rf__min_samples_leaf ': [5, 10, 20]
+}
 
-# Report 5-fold CV
-print('accuracy:')
-print(rf_CV['test_accuracy'].mean())
-print('ROC-AUC:')
-print(rf_CV['test_roc_auc_ovr'].mean())
-print('ROC-AUC:')
-print(rf_CV['test_roc_auc_ovr_weighted'].mean())
+rf_search = GridSearchCV(rf_pipeline,
+                         rf_param_grid,
+                         n_jobs =-1,
+                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         cv = custom_cv)
+
+rf_search.fit(X_train, y_train)
+
+# Record best model results
+rf_predict = rf_search.predict(X_test)
+accuracy_log['rf'] = accuracy_score(y_test, rf_predict)
+
+################################################################################
+# OVR Random Forest
+################################################################################
+
+ovr_rf = OneVsRestClassifier(
+    RandomForestClassifier(
+        n_estimators = 500,
+        criterion = 'gini',
+        min_samples_split = 5,
+        min_samples_leaf = 5,
+        max_features = 'sqrt',
+        n_jobs = -1,
+        random_state = 0,
+        class_weight = 'balanced_subsample'
+        )
+    )
+
+
+# Set up Pipeline
+ovr_rf_pipeline = Pipeline(steps =[
+  ('svd', svd),
+  ('ovr_rf', ovr_rf)
+])
+
+# Set up grid for hyperparameter optimization
+ovr_rf_param_grid = {
+  'ovr_rf__min_samples_split': [5, 10, 20],
+  'ovr_rf__min_samples_leaf ': [5, 10, 20]
+}
+
+ovr_rf_search = GridSearchCV(rf_pipeline,
+                         ovr_rf_param_grid,
+                         n_jobs =-1,
+                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         cv = custom_cv)
+
+ovr_rf_search.fit(X_train, y_train)
+
+# Record best model results
+ovr_rf_predict = ovr_rf_search.predict(X_test)
+accuracy_log['ovr_rf'] = accuracy_score(y_test, ovr_rf_predict)
+
+################################################################################
+# ADA Boost 
+################################################################################
+
+adaboost = AdaBoostClassifier(
+    n_estimators = 500,
+    random_state = 0,
+    algorithim = 'SAMME')
+
+# Set up Pipeline
+adaboost_pipeline = Pipeline(steps =[
+  ('svd', svd),
+  ('adaboost', adaboost)
+])
+
+# Set up grid for hyperparameter optimization
+adaboost_param_grid = {
+  'adaboost__learning_rate': [0.001, 0.01, 0.1,1]
+}
+
+adaboost_search = GridSearchCV(adaboost_pipeline,
+                         adaboost_param_grid,
+                         n_jobs =-1,
+                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         cv = custom_cv)
+
+adaboost_search.fit(X_train, y_train)
+
+# Record best model results
+adaboost_predict = adaboost_search.predict(X_test)
+accuracy_log['adaboost'] = accuracy_score(y_test, adaboost_predict)
 
 ################################################################################
 # OVR Linear SVC
@@ -194,7 +344,6 @@ print(rf_CV['test_roc_auc_ovr_weighted'].mean())
 # Set up SVM object
 svc = LinearSVC(penalty = 'l2',
                 loss = 'hinge',
-                C = 1,
                 multi_class = 'ovr',
                 class_weight = 'balanced',
                 random_state = 0)
@@ -205,58 +354,22 @@ svc_pipeline = Pipeline(steps = [
   ('svc', svc)
 ])
 
-# Compute 5-fold CV
-svc_CV = cross_validate(
-  svc_pipeline,
-  X,
-  y,
-  cv = 5,
-  scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
-  n_jobs = -1
-)
+# Set up grid for hyperparameter optimization
+svc_param_grid = {
+  'svc__C': [0.001, 0.01, 0.1, 1, 10, 100]
+}
 
-# Report 5-fold CV
-print('accuracy:')
-print(svc_CV['test_accuracy'].mean())
-print('ROC-AUC:')
-print(svc_CV['test_roc_auc_ovr'].mean())
-print('ROC-AUC:')
-print(svc_CV['test_roc_auc_ovr_weighted'].mean())
+svc_search = GridSearchCV(svc_pipeline,
+                         svc_param_grid,
+                         n_jobs =-1,
+                         scoring = ('accuracy','roc_auc_ovr', 'roc_auc_ovr_weighted'),
+                         cv = custom_cv)
 
+svc_search.fit(X_train, y_train)
 
-# TODO/IDEAS:
-# Stratify data - done automatically by cross_validate 
-# put in random seed to ensure replicability 
-# Save outputs 
-# Delete rows
-# see how much variance is explained by PCA
-
-# OVR with lasso
-# Multinomial
-# Multinomial with lasso
-
-# RF (multinomial)
-# RF (OVR)
-
-# SVM (svc) - OVR
-
-# XGBoost 
-# XGboost (OVR)
-
-
-# Figure out how multi-class ROC-AUC
-# Is there a need to do OVR RF - wil lit be different/better than normal?
-# Best C for logistic reg L1
-# Best C for multiclass reg L1
-# Best C for linear SVM reg L2
-# How does the SVM work
-   
-
-
-
-
-
-
+# Record best model results
+svc_predict = svc_search.predict(X_test)
+accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
 
 
 

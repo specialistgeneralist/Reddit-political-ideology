@@ -8,7 +8,7 @@ import scipy.sparse
 from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import GridSearchCV, train_test_split, ShuffleSplit
+from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedShuffleSplit
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import LinearSVC
@@ -57,7 +57,10 @@ y.reset_index(drop = True, inplace=True)
 
 
 # Split data into train andtest sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                    test_size = 0.2, 
+                                                    stratify = y,
+                                                    random_state = 0)
 y_train.reset_index(drop=True, inplace=True)
 y_test.reset_index(drop=True, inplace=True)
 
@@ -76,7 +79,7 @@ accuracy_log = {}
 svd = TruncatedSVD(n_components = 1000, random_state = 0)
 
 # Set up custom train/validate split
-custom_cv = ShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
+custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
 
 ################################################################################
 # ZeroR -- baseline
@@ -392,4 +395,6 @@ svc_search.fit(X_train, y_train)
 # Record best model results
 svc_predict = svc_search.predict(X_test)
 accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
+
+
 

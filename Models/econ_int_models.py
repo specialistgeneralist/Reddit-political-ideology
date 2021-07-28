@@ -406,30 +406,3 @@ auc_log['ovr_adaboost'] = roc_auc_score(y_test, ovr_adaboost_predict_prob, avera
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

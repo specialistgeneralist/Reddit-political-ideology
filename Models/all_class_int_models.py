@@ -74,6 +74,7 @@ y_test.reset_index(drop=True, inplace=True)
 
 # Set up dictionary to store results 
 accuracy_log = {}
+auc_log = {}
 
 # Set up object for truncated SVD
 svd = TruncatedSVD(n_components = 1000, random_state = 0)
@@ -120,6 +121,9 @@ ovr_logreg_pipeline.fit(X_train, y_train)
 ovr_logreg_predict = ovr_logreg_pipeline.predict(X_test)
 accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
 
+ovr_logreg_predict_prob = ovr_logreg_pipeline.predict_proba(X_test)
+auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average = 'weighted', multi_class = 'ovr')
+
 ################################################################################
 # OVR Logistic regression - Lasso penalty
 ################################################################################
@@ -155,6 +159,9 @@ ovr_logreg_l1_search.fit(X_train, y_train)
 ovr_logreg_l1_predict = ovr_logreg_l1_search.predict(X_test)
 accuracy_log['ovr_logreg_l1'] = accuracy_score(y_test, ovr_logreg_l1_predict)
 
+ovr_logreg_l1_predict_prob = ovr_logreg_l1_search.predict_proba(X_test)
+auc_log['ovr_logreg_l1'] = roc_auc_score(y_test, ovr_logreg_l1_predict_prob, average = 'weighted', multi_class = 'ovr')
+
 ################################################################################
 # Multinomial Logistic regression - no penalty
 ################################################################################
@@ -179,6 +186,14 @@ multinomial_pipeline.fit(X_train, y_train)
 # Record the best model results 
 multinomial_predict = multinomial_pipeline.predict(X_test)
 accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
+
+# Record best model results
+multinomial_predict = multinomial_pipeline.predict(X_test)
+accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
+
+multinomial_predict_prob = multinomial_pipeline.predict_proba(X_test)
+auc_log['multinomial'] = roc_auc_score(y_test, multinomial_predict_prob, average = 'weighted', multi_class = 'ovr')
+
 
 ################################################################################
 # Multinomial Logistic regression - Lasso penalty
@@ -215,6 +230,8 @@ multinomial_l1_search.fit(X_train, y_train)
 multinomial_l1_predict = multinomial_l1_search.predict(X_test)
 accuracy_log['multinomial_l1'] = accuracy_score(y_test, multinomial_l1_predict)
 
+multinomial_l1_predict_prob = multinomial_l1_search.predict_proba(X_test)
+auc_log['multinomial_l1'] = roc_auc_score(y_test, multinomial_l1_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 ################################################################################
 # Random Forest
@@ -255,6 +272,9 @@ rf_search.fit(X_train, y_train)
 rf_predict = rf_search.predict(X_test)
 accuracy_log['rf'] = accuracy_score(y_test, rf_predict)
 
+rf_predict_prob = rf_search.predict_proba(X_test)
+auc_log['rf'] = roc_auc_score(y_test, rf_predict_prob, average = 'weighted', multi_class = 'ovr')
+
 ################################################################################
 # OVR Random Forest
 ################################################################################
@@ -281,11 +301,11 @@ ovr_rf_pipeline = Pipeline(steps =[
 
 # Set up grid for hyperparameter optimization
 ovr_rf_param_grid = {
-  'ovr_rf__min_samples_split': [5, 10, 20],
-  'ovr_rf__min_samples_leaf ': [5, 10, 20]
+  'ovr_rf__estimator__min_samples_split': [5, 10, 20],
+  'ovr_rf__estimator__min_samples_leaf': [5, 10, 20]
 }
 
-ovr_rf_search = GridSearchCV(rf_pipeline,
+ovr_rf_search = GridSearchCV(ovr_rf_pipeline,
                          ovr_rf_param_grid,
                          n_jobs =-1,
                          scoring = 'accuracy',
@@ -296,6 +316,9 @@ ovr_rf_search.fit(X_train, y_train)
 # Record best model results
 ovr_rf_predict = ovr_rf_search.predict(X_test)
 accuracy_log['ovr_rf'] = accuracy_score(y_test, ovr_rf_predict)
+
+ovr_rf_predict_prob = ovr_rf_search.predict_proba(X_test)
+auc_log['ovr_rf'] = roc_auc_score(y_test, ovr_rf_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 ################################################################################
 # ADA Boost 
@@ -328,6 +351,9 @@ adaboost_search.fit(X_train, y_train)
 # Record best model results
 adaboost_predict = adaboost_search.predict(X_test)
 accuracy_log['adaboost'] = accuracy_score(y_test, adaboost_predict)
+
+adaboost_predict_prob = adaboost_search.predict_proba(X_test)
+auc_log['adaboost'] = roc_auc_score(y_test, adaboost_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 
 ################################################################################
@@ -362,39 +388,5 @@ ovr_adaboost_search.fit(X_train, y_train)
 ovr_adaboost_predict = ovr_adaboost_search.predict(X_test)
 accuracy_log['ovr_adaboost'] = accuracy_score(y_test, ovr_adaboost_predict)
 
-################################################################################
-# OVR Linear SVC
-################################################################################
-
-# Set up SVM object
-svc = LinearSVC(penalty = 'l2',
-                loss = 'hinge',
-                multi_class = 'ovr',
-                class_weight = 'balanced',
-                random_state = 0)
-
-# Set up pipeline
-svc_pipeline = Pipeline(steps = [
-  ('svd', svd),
-  ('svc', svc)
-])
-
-# Set up grid for hyperparameter optimization
-svc_param_grid = {
-  'svc__C': [0.001, 0.01, 0.1, 1, 10, 100]
-}
-
-svc_search = GridSearchCV(svc_pipeline,
-                         svc_param_grid,
-                         n_jobs =-1,
-                         scoring = 'accuracy',
-                         cv = custom_cv)
-
-svc_search.fit(X_train, y_train)
-
-# Record best model results
-svc_predict = svc_search.predict(X_test)
-accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
-
-
-
+ovr_adaboost_predict_prob = ovr_adaboost_search.predict_proba(X_test)
+auc_log['ovr_adaboost'] = roc_auc_score(y_test, ovr_adaboost_predict_prob, average = 'weighted', multi_class = 'ovr')

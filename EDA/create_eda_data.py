@@ -51,8 +51,6 @@ grouped_data_row.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/eda_prop.p
 ################################################################################
 #   Distribution of comments per ideology
 ################################################################################
-# Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
 
 # Create list of relevant subreddits
 subreddits = ['user.flair','depression','Anxiety','OCD','bipolar','Bitcoin','wallstreetbets','conspiracy',

@@ -47,3 +47,20 @@ grouped_data_row = grouped_data_row.reindex(['authleft', 'left', 'libleft', 'lib
 
 # Export to parquet
 grouped_data_row.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/eda_prop.parquet')
+
+################################################################################
+#   Distribution of comments per ideology
+################################################################################
+# Load data
+data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+
+# Create list of relevant subreddits
+subreddits = ['user.flair','depression','Anxiety','OCD','bipolar','Bitcoin','wallstreetbets','conspiracy',
+  'lgbt', 'AgainstHateSubreddits','TwoXChromosomes', 'MensRights', 'FemaleDatingStrategy',
+  'MGTOW2','anime','MMA','Minecraft','movies','gaming','sports']
+
+# Select only relevant columns
+data = data[subreddits]
+
+# Export to parquet 
+data.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/eda_dist.parquet')

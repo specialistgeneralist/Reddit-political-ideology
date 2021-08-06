@@ -11,24 +11,34 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedShuffleSplit
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.svm import LinearSVC
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
+from sklearn.preprocessing import Binarizer
 
 # Load data
 data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
 
 # Remove explicitly political columns
+political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
+                  'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
+                  'republicans', 'conservatives']
+data.drop(columns = political_subs, inplace = True)
 
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 
 # Remove columns with insufficient interaction 
-
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
-#  [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+# This loop will remove subreddits with less than 50 comments and users with less than 50 comments until no row
+# or column violates this condition
+while True:
+  print('in: '+str(data.shape))
+  size = data.size 
+  col_sum = data.sum(axis = 0, numeric_only = True)
+  row_sum = data.sum(axis = 1, numeric_only = True)
+  bad_cols = col_sum[col_sum <= 50].index
+  bad_rows = row_sum[row_sum <= 50].index
+  data.drop(index = bad_rows, columns = bad_cols, inplace = True)
+  print('out: ' + str(data.shape))
+  if data.size == size:
+      break
 
 # Seperate data into target/features and make features sparse
 features = list(data.columns)
@@ -64,6 +74,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
 y_train.reset_index(drop=True, inplace=True)
 y_test.reset_index(drop=True, inplace=True)
 
+# Set up custom train/validate split
+custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
+
 # Data is now ready for modelling 
 
 ################################################################################
@@ -72,15 +85,20 @@ y_test.reset_index(drop=True, inplace=True)
 ################################################################################
 ################################################################################
 
-# Set up dictionary to store results 
+# Set up dictionaries to store results 
 accuracy_log = {}
 auc_log = {}
+model_log = {}
 
-# Set up object for truncated SVD
+# Set up scorer for weighted OVR AUC-ROC
+scorer = make_scorer(roc_auc_score, needs_proba = True, multi_class='ovr', average ='weighted')
+
+# Set up object for truncated SVD 
 svd = TruncatedSVD(n_components = 1000, random_state = 0)
 
-# Set up custom train/validate split
-custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
+# Set up binarizer
+binarizer = Binarizer()
+
 
 ################################################################################
 # ZeroR -- baseline
@@ -110,19 +128,34 @@ ovr_logreg = LogisticRegression(solver = 'saga',
 
 # Set up Pipeline 
 ovr_logreg_pipeline = Pipeline(steps = [
+  ('binarizer', binarizer),   
   ('svd', svd),
   ('ovr_logreg', ovr_logreg)
 ])
 
-# Fit the model
-ovr_logreg_pipeline.fit(X_train, y_train)
+
+# Set up grid for hyperparameter optimization 
+ovr_logreg_param_grid = {
+    'binarizer': ['passthrough', binarizer],
+    'ovr_logreg__class_weight': ['balanced', None]
+    }
+
+ovr_logreg_search = GridSearchCV(ovr_logreg_pipeline,
+                      ovr_logreg_param_grid,
+                      n_jobs =-1,
+                      scoring = 'accuracy',
+                      cv = custom_cv)
+
+ovr_logreg_search.fit(X_train, y_train)
 
 # Record best model results 
-ovr_logreg_predict = ovr_logreg_pipeline.predict(X_test)
+ovr_logreg_predict = ovr_logreg_search.predict(X_test)
 accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
 
-ovr_logreg_predict_prob = ovr_logreg_pipeline.predict_proba(X_test)
+ovr_logreg_predict_prob = ovr_logreg_search.predict_proba(X_test)
 auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average = 'weighted', multi_class = 'ovr')
+
+model_log['ovr_logreg'] = str(ovr_logreg_search.best_estimator_)
 
 ################################################################################
 # OVR Logistic regression - Lasso penalty
@@ -138,13 +171,16 @@ ovr_logreg_l1 = LogisticRegression(solver = 'saga',
 
 # Set up Pipeline 
 ovr_logreg_l1_pipeline = Pipeline(steps = [
+  ('binarizer', binarizer),   
   ('svd', svd),
   ('ovr_logreg_l1', ovr_logreg_l1)
 ])
 
-# Set up grid for hyperparameter optimization
+# Set up grid for hyperparameter optimization 
 ovr_logreg_l1_param_grid = {
-    'ovr_logreg_l1__C': [0.001, 0.01, 0.1]
+    'binarizer': ['passthrough', binarizer],
+    'ovr_logreg_l1__C': [0.001, 0.01, 0.1, 1, 10, 100],
+    'ovr_logreg_l1__class_weight': ['balanced', None]
     }
 
 ovr_logreg_l1_search = GridSearchCV(ovr_logreg_l1_pipeline,
@@ -162,6 +198,8 @@ accuracy_log['ovr_logreg_l1'] = accuracy_score(y_test, ovr_logreg_l1_predict)
 ovr_logreg_l1_predict_prob = ovr_logreg_l1_search.predict_proba(X_test)
 auc_log['ovr_logreg_l1'] = roc_auc_score(y_test, ovr_logreg_l1_predict_prob, average = 'weighted', multi_class = 'ovr')
 
+model_log['ovr_logreg_l1'] = str(ovr_logreg_l1_search.best_estimator_)
+
 ################################################################################
 # Multinomial Logistic regression - no penalty
 ################################################################################
@@ -176,23 +214,35 @@ multinomial = LogisticRegression(solver = 'saga',
 
 # Set up Pipeline 
 multinomial_pipeline = Pipeline(steps = [
+  ('binarizer', binarizer), 
   ('svd', svd),
   ('multinomial', multinomial)
 ])
 
-# Fit the model
-multinomial_pipeline.fit(X_train, y_train)
+# Set up grid for hyperparameter optimization 
+multinomial_param_grid = {
+    'binarizer': ['passthrough', binarizer],
+    'multinomial__class_weight': ['balanced', None]
+    }
+
+multinomial_search = GridSearchCV(multinomial_pipeline,
+                      multinomial_param_grid,
+                      n_jobs =-1,
+                      scoring = 'accuracy',
+                      cv = custom_cv)
+
+multinomial_search.fit(X_train, y_train)
+
 
 # Record the best model results 
-multinomial_predict = multinomial_pipeline.predict(X_test)
+multinomial_predict = multinomial_search.predict(X_test)
 accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
 
-# Record best model results
-multinomial_predict = multinomial_pipeline.predict(X_test)
-accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
 
-multinomial_predict_prob = multinomial_pipeline.predict_proba(X_test)
+multinomial_predict_prob = multinomial_search.predict_proba(X_test)
 auc_log['multinomial'] = roc_auc_score(y_test, multinomial_predict_prob, average = 'weighted', multi_class = 'ovr')
+
+model_log['multinomial'] = str(multinomial_search.best_estimator_)
 
 
 ################################################################################
@@ -209,13 +259,15 @@ multinomial_l1 = LogisticRegression(solver = 'saga',
 
 # Set up Pipeline
 multinomial_l1_pipeline = Pipeline(steps = [
+  ('binarizer', binarizer),     
   ('svd', svd),
   ('multinomial_l1', multinomial_l1)
 ])
 
 # Set up grid for hyperparameter optimization
 multinomial_l1_param_grid = {
-  'multinomial_l1__C': [0.001, 0.01, 0.1]
+  'binarizer': ['passthrough', binarizer],
+  'multinomial_l1__C': [0.001, 0.01, 0.1, 1, 10, 100]
 }
 
 multinomial_l1_search = GridSearchCV(multinomial_l1_pipeline,
@@ -232,6 +284,9 @@ accuracy_log['multinomial_l1'] = accuracy_score(y_test, multinomial_l1_predict)
 
 multinomial_l1_predict_prob = multinomial_l1_search.predict_proba(X_test)
 auc_log['multinomial_l1'] = roc_auc_score(y_test, multinomial_l1_predict_prob, average = 'weighted', multi_class = 'ovr')
+
+model_log['multinomial_l1'] = str(multinomial_l1_search.best_estimator_)
+
 
 ################################################################################
 # Random Forest
@@ -250,14 +305,17 @@ rf = RandomForestClassifier(n_estimators = 500,
 
 # Set up Pipeline
 rf_pipeline = Pipeline(steps =[
+  ('binarizer', binarizer),      
   ('svd', svd),
   ('rf', rf)
 ])
 
 # Set up grid for hyperparameter optimization
 rf_param_grid = {
+  'binarizer': ['passthrough', binarizer],
   'rf__min_samples_split': [5, 10, 20],
-  'rf__min_samples_leaf': [5, 10, 20]
+  'rf__min_samples_leaf': [5, 10, 20],
+  'rf__class_weight': ['balanced_subsample', None]
 }
 
 rf_search = GridSearchCV(rf_pipeline,
@@ -274,6 +332,9 @@ accuracy_log['rf'] = accuracy_score(y_test, rf_predict)
 
 rf_predict_prob = rf_search.predict_proba(X_test)
 auc_log['rf'] = roc_auc_score(y_test, rf_predict_prob, average = 'weighted', multi_class = 'ovr')
+
+model_log['rf'] = str(rf_search.best_estimator_)
+
 
 ################################################################################
 # OVR Random Forest
@@ -295,14 +356,17 @@ ovr_rf = OneVsRestClassifier(
 
 # Set up Pipeline
 ovr_rf_pipeline = Pipeline(steps =[
+  ('binarizer', binarizer),     
   ('svd', svd),
   ('ovr_rf', ovr_rf)
 ])
 
 # Set up grid for hyperparameter optimization
 ovr_rf_param_grid = {
+  'binarizer': ['passthrough', binarizer],  
   'ovr_rf__estimator__min_samples_split': [5, 10, 20],
-  'ovr_rf__estimator__min_samples_leaf': [5, 10, 20]
+  'ovr_rf__estimator__min_samples_leaf': [5, 10, 20],
+  'ovr_rf__estimator__class_weight': ['balanced_subsample', None]  
 }
 
 ovr_rf_search = GridSearchCV(ovr_rf_pipeline,
@@ -320,6 +384,8 @@ accuracy_log['ovr_rf'] = accuracy_score(y_test, ovr_rf_predict)
 ovr_rf_predict_prob = ovr_rf_search.predict_proba(X_test)
 auc_log['ovr_rf'] = roc_auc_score(y_test, ovr_rf_predict_prob, average = 'weighted', multi_class = 'ovr')
 
+model_log['ovr_rf'] = str(ovr_rf_search.best_estimator_)
+
 ################################################################################
 # ADA Boost 
 ################################################################################
@@ -331,13 +397,15 @@ adaboost = AdaBoostClassifier(
 
 # Set up Pipeline
 adaboost_pipeline = Pipeline(steps =[
+  ('binarizer', binarizer),
   ('svd', svd),
   ('adaboost', adaboost)
 ])
 
 # Set up grid for hyperparameter optimization
 adaboost_param_grid = {
-  'adaboost__learning_rate': [0.001, 0.01, 0.1,1]
+  'binarizer': ['passthrough', binarizer],    
+  'adaboost__learning_rate': [0.001, 0.01, 0.1, 1]
 }
 
 adaboost_search = GridSearchCV(adaboost_pipeline,
@@ -355,38 +423,21 @@ accuracy_log['adaboost'] = accuracy_score(y_test, adaboost_predict)
 adaboost_predict_prob = adaboost_search.predict_proba(X_test)
 auc_log['adaboost'] = roc_auc_score(y_test, adaboost_predict_prob, average = 'weighted', multi_class = 'ovr')
 
+model_log['adaboost'] = str(adaboost_search.best_estimator_)
+
 
 ################################################################################
-# OVR ADA Boost 
+# Save results into a csv for the write-up
 ################################################################################
 
-ovr_adaboost = OneVsRestClassifier(AdaBoostClassifier(
-  n_estimators = 500,
-  random_state = 0,
-  algorithim = 'SAMME'))
+# Turn result dictionaries into a dataframe
+model_df = pd.DataFrame(model_log, index = ['model'])
+acc_df = pd.DataFrame(accuracy_log, index=['accuracy'])
+auc_df = pd.DataFrame(auc_log, index=['auc'])
 
-# Set up Pipeline
-ovr_adaboost_pipeline = Pipeline(steps =[
-  ('svd', svd),
-  ('ovr_adaboost', ovr_adaboost)
-])
+# Join these rowwise
+results = pd.concat([acc_df, auc_df, model_df])
+results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
-# Set up grid for hyperparameter optimization
-ovr_adaboost_param_grid = {
-  'ovr_adaboost__learning_rate': [0.001, 0.01, 0.1,1]
-}
-
-ovr_adaboost_search = GridSearchCV(ovr_adaboost_pipeline,
-                               ovr_adaboost_param_grid,
-                               n_jobs =-1,
-                               scoring = 'accuracy',
-                               cv = custom_cv)
-
-ovr_adaboost_search.fit(X_train, y_train)
-
-# Record best model results
-ovr_adaboost_predict = ovr_adaboost_search.predict(X_test)
-accuracy_log['ovr_adaboost'] = accuracy_score(y_test, ovr_adaboost_predict)
-
-ovr_adaboost_predict_prob = ovr_adaboost_search.predict_proba(X_test)
-auc_log['ovr_adaboost'] = roc_auc_score(y_test, ovr_adaboost_predict_prob, average = 'weighted', multi_class = 'ovr')
+# Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
+results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/all_int_results.csv')

@@ -7,9 +7,9 @@ import pandas as pd
 import scipy.sparse
 from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedShuffleSplit
+from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
+from sklearn.metrics import accuracy_score, roc_auc_score
 from sklearn.preprocessing import Binarizer
 import matplotlib.pyplot as plt
 
@@ -83,6 +83,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
 y_train.reset_index(drop=True, inplace=True)
 y_test.reset_index(drop=True, inplace=True)
 
+###############################################################################
+# K-ANALYSIS
+###############################################################################
+
+# Set up dictionary to store accuracy and ROC-AUC for prediction on varying k SVD components
+
 # Set up dictionary to store accuracy and ROC-AUC for prediction on varying k SVD components
 accuracy_log = {}
 auc_log = {}
@@ -144,17 +150,52 @@ plt.ylabel('ROC-AUC')
 plt.grid(True)
 plt.show()
 
+###############################################################################
+# COMP ANALYSIS
+###############################################################################
 
 
+svd_1 = pd.DataFrame(zip(features, svd.components_[0]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_2 = pd.DataFrame(zip(features, svd.components_[1]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_3 = pd.DataFrame(zip(features, svd.components_[2]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_4 = pd.DataFrame(zip(features, svd.components_[3]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_5 = pd.DataFrame(zip(features, svd.components_[4]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_6 = pd.DataFrame(zip(features, svd.components_[5]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_7 = pd.DataFrame(zip(features, svd.components_[6]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_8 = pd.DataFrame(zip(features, svd.components_[7]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_9 = pd.DataFrame(zip(features, svd.components_[8]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_10 = pd.DataFrame(zip(features, svd.components_[9]),
+               columns =['Feature', 'Value']).sort_values(by=['Value'], ascending = False)
+
+svd_k = pd.concat([
+    pd.concat([svd_1.head(10), svd_1.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_2.head(10), svd_2.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_3.head(10), svd_3.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_4.head(10), svd_4.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_5.head(10), svd_5.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_6.head(10), svd_6.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_7.head(10), svd_7.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_8.head(10), svd_8.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_9.head(10), svd_9.tail(10)]).reset_index(drop=True),
+    pd.concat([svd_10.head(10), svd_10.tail(10)]).reset_index(drop=True)], axis=1)
 
 
-
-
-
-
-
-
-
-
-
-
+svd_k.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_k.csv')

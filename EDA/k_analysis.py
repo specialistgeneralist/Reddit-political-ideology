@@ -199,3 +199,9 @@ svd_k = pd.concat([
 
 
 svd_k.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_k.csv')
+
+ovr_logreg.fit(X_train[:,0:10], y_train)
+svd_coef = pd.DataFrame(ovr_logreg.coef_)
+svd_coef.index = list(ovr_logreg.classes_)
+svd_coef.columns = [("svd " + str(n)) for n in range(1,11)]
+svd_coef

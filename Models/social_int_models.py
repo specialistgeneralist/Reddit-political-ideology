@@ -105,7 +105,7 @@ model_log = {}
 scorer = make_scorer(roc_auc_score, needs_proba = True, multi_class='ovr', average ='weighted')
 
 # Set up object for truncated SVD 
-svd = TruncatedSVD(n_components = 1000, random_state = 0)
+svd = TruncatedSVD(n_components = 500, random_state = 0)
 
 # Set up binarizer
 binarizer = Binarizer()

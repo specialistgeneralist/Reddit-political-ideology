@@ -1,99 +1,165 @@
 library(tidyverse)
 library(patchwork)
 
+all_class <- read_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/all_int_results.csv') %>%
+  rename(model_name = X1)
+all_class <- as_tibble(cbind(nms = colnames(all_class ), t(all_class)))
+colnames(all_class ) <- all_class [1,] 
+all_class  <- all_class  %>% 
+  select(-model) %>%
+  slice(-1) %>%
+  rename(acc = accuracy) %>%
+  mutate(acc = as.numeric(acc),
+         auc = as.numeric(auc),
+         model_name = case_when(
+           model_name == 'multinomial_l1' ~ 'Multinomial w L1',
+           model_name == 'multinomial' ~ 'Multinomial',
+           model_name == 'ovr_logreg_l1' ~ 'OVR logistic w L1',
+           model_name == 'ovr_logreg' ~ 'OVR logistic',
+           model_name == 'adaboost' ~ 'AdaBoost',
+           model_name == 'rf' ~ 'Random forest',
+           model_name == 'ovr_rf' ~ 'OVR Random forest',
+           model_name == 'zero_r' ~ 'Zero R'
+         )
+  )
+
+
+econ_class <- read_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_int_results.csv') %>%
+  rename(model_name = X1)
+econ_class <- as_tibble(cbind(nms = colnames(econ_class ), t(econ_class)))
+colnames(econ_class ) <- econ_class [1,] 
+econ_class  <- econ_class  %>% 
+  select(-model) %>%
+  slice(-1) %>%
+  rename(acc = accuracy) %>%
+  mutate(acc = as.numeric(acc),
+         auc = as.numeric(auc),
+         model_name = case_when(
+           model_name == 'multinomial_l1' ~ 'Multinomial w L1',
+           model_name == 'multinomial' ~ 'Multinomial',
+           model_name == 'ovr_logreg_l1' ~ 'OVR logistic w L1',
+           model_name == 'ovr_logreg' ~ 'OVR logistic',
+           model_name == 'adaboost' ~ 'AdaBoost',
+           model_name == 'rf' ~ 'Random forest',
+           model_name == 'ovr_rf' ~ 'OVR Random forest',
+           model_name == 'zero_r' ~ 'Zero R'
+         )
+  )
+
+social_class <- read_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/social_int_results.csv') %>%
+  rename(model_name = X1)
+social_class <- as_tibble(cbind(nms = colnames(social_class ), t(social_class)))
+colnames(social_class ) <- social_class [1,] 
+social_class  <- social_class  %>% 
+  select(-model) %>%
+  slice(-1) %>%
+  rename(acc = accuracy) %>%
+  mutate(acc = as.numeric(acc),
+         auc = as.numeric(auc),
+         model_name = case_when(
+           model_name == 'multinomial_l1' ~ 'Multinomial w L1',
+           model_name == 'multinomial' ~ 'Multinomial',
+           model_name == 'ovr_logreg_l1' ~ 'OVR logistic w L1',
+           model_name == 'ovr_logreg' ~ 'OVR logistic',
+           model_name == 'adaboost' ~ 'AdaBoost',
+           model_name == 'rf' ~ 'Random forest',
+           model_name == 'ovr_rf' ~ 'OVR Random forest',
+           model_name == 'zero_r' ~ 'Zero R'
+         )
+  )
+  
 # **************************** Nine-class user int *****************************
 
-nine_class <- tibble(
-  `model` = c('OVR random forest', 'Random forest', 'AdaBoost', 'OVR logistic w. L1',
-           'Multinomial w. L1', 'OVR logistic', 'Multinomial','Zero R'),
-  `acc` = c(0.294, 0.283, 0.27, 0.245, 0.244, 0.243, 0.235, 0.206),
-  `auc` = c( 0.675, 0.657, 0.651, 0.677, 0.672, 0.68, 0.686, NA))
-
-p1 <- nine_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -acc ), y=acc)) +
+p1 <- all_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -acc ), y=acc)) +
   geom_col(, color="black", fill = "green") +
-  geom_hline(yintercept = 0.206, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = as.numeric(all_class[1,2]), linetype = "dashed", color = "red") +
   ylab('Accuracy') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p2 <- nine_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -auc ), y=auc)) +
+p2 <- all_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -auc ), y=auc)) +
   geom_col(, color="black", fill = "cyan") +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "magenta") +
   ylab('ROC-AUC') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p1 + p2
+(p1 +  p2) + 
+  plot_annotation(
+    title = 'All Class Classification',
+    subtitle = 'Accuracy and weighted ROC-AUC for models in the all class problem',
+    caption = 'Dotted line represents Zero R accuracy in accuracy plot and ROC-AUC 0.5 in the ROC-AUC plot'
+  ) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/data/results/result_viz/all_int_results.pdf", 
+       width = 32, height = 20, units = "cm")
 
 # **************************** econ user int *****************************
 
-econ_class <- tibble(
-  `model` = c('OVR logistic w L1','OVR logistic', 'Multinomial w L1',	'Multinomial',	'OVR Random forest',	
-  'Random forest',	'AdaBoost',	'Zero R'),
-  `acc` = c(0.52,	0.52,	0.519,	0.518,	0.505,	0.502,	0.499,	0.363),
-  `auc` = c(0.713,	0.713,	0.713,	0.713,	0.693,	0.687,	0.683, NA))
-
-p3 <- econ_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -acc ), y=acc)) +
+p3 <- econ_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -acc ), y=acc)) +
   geom_col(, color="black", fill = "green") +
-  geom_hline(yintercept = 0.363, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = as.numeric(econ_class[1,2]), linetype = "dashed", color = "red") +
   ylab('Accuracy') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p4 <- econ_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -auc ), y=auc)) +
+p4 <- econ_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -auc ), y=auc)) +
   geom_col(, color="black", fill = "cyan") +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "magenta") +
   ylab('ROC-AUC') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
+(p3 +  p4) + 
+  plot_annotation(
+  title = 'Economic Classification',
+  subtitle = 'Accuracy and weighted ROC-AUC for models in the economic problem',
+  caption = 'Dotted line represents Zero R accuracy in accuracy plot and ROC-AUC 0.5 in the ROC-AUC plot'
+) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p3 +  p4
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/data/results/result_viz/econ_int_results.pdf", 
+       width = 32, height = 20, units = "cm")
 
 # **************************** social user int *****************************
 
-social_class <- tibble(
-  `model` = c('OVR Random forest',	'Random forest',	'AdaBoost',	'Zero R', 'OVR logistic with L1',	'OVR logistic',
-    'Multinomial w L1',	'Multinomial'),
-  `acc` = c(0.538,	0.537,	0.536,	0.523,	0.469,	0.446,	0.439,	0.438),
-  `auc` = c(0.636,	0.627,	0.616,  NA,		0.641,	0.643,	0.641,	0.639))
-
-p5 <- social_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -acc ), y=acc)) +
+p5 <- social_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -acc ), y=acc)) +
   geom_col(, color="black", fill = "green") +
-  geom_hline(yintercept = 0.523, linetype = "dashed", color = "red") +
+  geom_hline(yintercept = as.numeric(social_class[1,2]), linetype = "dashed", color = "red") +
   ylab('Accuracy') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p6 <- social_class %>% filter(model != 'Zero R') %>% 
-  ggplot(aes(x=reorder(model, -auc ), y=auc)) +
+p6 <- social_class %>% filter(model_name != 'Zero R') %>% 
+  ggplot(aes(x=reorder(model_name, -auc ), y=auc)) +
   geom_col(, color="black", fill = "cyan") +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "magenta") +
   ylab('ROC-AUC') +
-  xlab('Model') +
+  xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
+(p5 +  p6) + 
+  plot_annotation(
+    title = 'Social Classification',
+    subtitle = 'Accuracy and weighted ROC-AUC for models in the economic problem',
+    caption = 'Dotted line represents Zero R accuracy in accuracy plot and ROC-AUC 0.5 in the ROC-AUC plot'
+  ) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-p5 + p6
-
-
-
-
-
-
-
-
-
-
-
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/data/results/result_viz/social_int_results.pdf", 
+       width = 32, height = 20, units = "cm")

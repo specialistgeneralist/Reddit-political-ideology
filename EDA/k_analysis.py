@@ -105,7 +105,7 @@ X_train = binarizer.transform(X_train)
 X_test = binarizer.transform(X_test)
 
 # Compute the first 2000 SVD components of predictors (from training set) and transform test and training data accordingly
-svd = TruncatedSVD(n_components = 2000, random_state = 0)
+svd = TruncatedSVD(n_components = 1000, random_state = 0)
 svd.fit(X_train)
 X_train = svd.transform(X_train)
 X_test = svd.transform(X_test)
@@ -119,7 +119,7 @@ ovr_logreg = LogisticRegression(solver = 'saga',
                                 n_jobs = -1)
 
 # Loop through different k and train model on first k principles components recording accuracy and ROC-AUC
-for k in range(1, 2001, 25):
+for k in range(1, 1001, 25):
   
   X_test_temp = X_test[:,0:k]
   
@@ -141,6 +141,7 @@ plt.title('No. SVD components and accuracy')
 plt.xlabel('K components')
 plt.ylabel('Accuracy')
 plt.grid(True)
+plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/k_svd_acc.pdf', dpi=600)
 plt.show()
 
 plt.plot(k_components, auc, color='blue')
@@ -148,6 +149,7 @@ plt.title('No. SVD components and weighted AUC')
 plt.xlabel('K components')
 plt.ylabel('ROC-AUC')
 plt.grid(True)
+plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/k_svd_auc.pdf', dpi=600)
 plt.show()
 
 ###############################################################################

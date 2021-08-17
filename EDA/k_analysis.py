@@ -207,3 +207,36 @@ svd_coef = pd.DataFrame(ovr_logreg.coef_)
 svd_coef.index = list(ovr_logreg.classes_)
 svd_coef.columns = [("svd " + str(n)) for n in range(1,11)]
 svd_coef
+
+
+color = ['red' if flair == 'left' else 'blue' if flair == 'right' else 'grey' for flair in list(y_train)]
+
+plt.scatter(x=X_train[:,0],
+            y=X_train[:,1],
+            c=color,
+            marker='D',
+            alpha = 0.1)
+plt.xlabel('SVD component 1')
+plt.ylabel('SVD component 2')
+
+
+plt.scatter(x=X_train[:,2],
+            y=X_train[:,3],
+            c=color,
+            marker='D',
+            alpha = 0.1)
+plt.xlabel('SVD component 3')
+plt.ylabel('SVD component 4')
+
+plt.scatter(x=X_train[:,4],
+            y=X_train[:,5],
+            c=color,
+            marker='D',
+            alpha = 0.1)
+plt.xlabel('SVD component 5')
+plt.ylabel('SVD component 6') 
+plt.title('Leftwing (red), rightwing (blue) and centrist (grey) users')
+plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/svd_scatterplot', dpi=600)
+plt.show()
+
+

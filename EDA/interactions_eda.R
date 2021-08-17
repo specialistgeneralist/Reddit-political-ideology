@@ -2,7 +2,11 @@ library(tidyverse)
 library(patchwork)
 library(arrow)
 
-data <- read_parquet('~/Desktop/WORK/Monash/Thesis/Data Collection/Complete Data/eda_data.parquet')
+data <- read_parquet('~/Desktop/WORK/Monash/Thesis/Data collection/Complete Data/eda_prop.parquet')
+
+################################################################################
+# Barplots
+################################################################################
 
 # Mental health themed visualizations 
 
@@ -75,7 +79,13 @@ cons <- data %>%
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
 
-bitcoin + wsb + cons
+(bitcoin + wsb + cons)  + plot_annotation(
+  title = 'Proportion of comments in interest subreddits by ideology',
+) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/lib_eda.pdf", 
+       width = 32, height = 20, units = "cm")
 
 # Might expect to be left wing 
 
@@ -195,4 +205,91 @@ sports <- data %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-(anime + mma + minecraft)/(movies + gaming + sports)
+(anime + mma + minecraft)/(movies + gaming + sports) + 
+  plot_annotation(
+    title = 'Proportion of comments in interest-related subreddits by ideology',
+  ) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/interests_eda.pdf", 
+       width = 32, height = 20, units = "cm")
+
+################################################################################
+# Density plots
+################################################################################
+
+data <- read_parquet('~/Desktop/WORK/Monash/Thesis/Data collection/Complete Data/eda_dist.parquet')
+
+d1 <- data %>% select('user.flair','Bitcoin') %>%
+  mutate(user.flair = case_when(
+    user.flair == 'centrist' ~ 'center',
+    user.flair == 'libcenter' ~ 'center',
+    user.flair == 'authcenter' ~ 'center',
+    user.flair == 'left' ~ 'left',
+    user.flair == 'authleft' ~ 'left',
+    user.flair == 'libleft' ~ 'left',
+    user.flair == 'right' ~ 'right',
+    user.flair == 'libright' ~ 'right',
+    user.flair == 'authright' ~ 'right'),
+    log_bitcoin = log(Bitcoin)) %>% 
+  filter(user.flair != 'center') %>% 
+  ggplot(aes(x=log_bitcoin, y=3*(..density..)/sum(..density..), fill = user.flair)) +
+  geom_density(alpha = 1/3) +
+  ylab('') +
+  xlab('Log comments in R/Bitcoin') +
+  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+
+d2 <- data %>% select('user.flair','movies') %>%
+  mutate(user.flair = case_when(
+    user.flair == 'centrist' ~ 'center',
+    user.flair == 'libcenter' ~ 'lib',
+    user.flair == 'authcenter' ~ 'auth',
+    user.flair == 'left' ~ 'center',
+    user.flair == 'authleft' ~ 'auth',
+    user.flair == 'libleft' ~ 'lib',
+    user.flair == 'right' ~ 'center',
+    user.flair == 'libright' ~ 'lib',
+    user.flair == 'authright' ~ 'auth'),
+    log_movies = log(movies)) %>% 
+  filter(user.flair != 'center') %>% 
+  ggplot(aes(x=log_movies, y=3*(..density..)/sum(..density..), fill = user.flair)) +
+  geom_density(alpha = 1/2) +
+  ylab('') +
+  xlab('Log comments in R/movies') +
+  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+
+d1 + d2
+
+
+data %>% select('user.flair','Bitcoin') %>%
+  mutate(user.flair = case_when(
+    user.flair == 'centrist' ~ 'center',
+    user.flair == 'libcenter' ~ 'center',
+    user.flair == 'authcenter' ~ 'center',
+    user.flair == 'left' ~ 'left',
+    user.flair == 'authleft' ~ 'left',
+    user.flair == 'libleft' ~ 'left',
+    user.flair == 'right' ~ 'right',
+    user.flair == 'libright' ~ 'right',
+    user.flair == 'authright' ~ 'right'),
+    log_bitcoin = log(Bitcoin)) %>% 
+  ggplot( aes(x= user.flair, y = log_bitcoin, fill = user.flair)) +
+  geom_boxplot()
+
+data %>% 
+  mutate(
+    log = log(MensRights)) %>% 
+  ggplot( aes(x= user.flair, y = log, fill = user.flair)) +
+  geom_boxplot()
+
+  ylab('') +
+  xlab('Log comments in R/movies') +
+  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
+
+

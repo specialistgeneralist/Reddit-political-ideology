@@ -13,16 +13,16 @@ data <- read_parquet('~/Desktop/WORK/Monash/Thesis/Data collection/Complete Data
 mh_1 <- data %>% 
   select('user.flair','depression') %>% 
   ggplot(aes(x=reorder(user.flair, -depression), y = depression)) + 
-  geom_col(color = 'black', fill = 'green') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/depression') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
- 
+
 mh_2 <- data %>% 
   select('user.flair','Anxiety') %>% 
   ggplot(aes(x=reorder(user.flair, -Anxiety), y = Anxiety)) + 
-  geom_col(color = 'black', fill = 'green') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/Anxiety') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -31,30 +31,26 @@ mh_2 <- data %>%
 mh_3 <- data %>% 
   select('user.flair','OCD') %>% 
   ggplot(aes(x=reorder(user.flair, -OCD), y = OCD)) + 
-  geom_col(color = 'black', fill = 'green') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/OCD') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-mh_4 <- data %>% 
-  select('user.flair','bipolar') %>% 
-  ggplot(aes(x=reorder(user.flair, -bipolar), y = bipolar)) + 
-  geom_col(color = 'black', fill = 'green') +
-  ylab('r/bipolar') +
-  xlab('') +
+(mh_1 + mh_2 + mh_3) + plot_annotation(
+  title = 'Proportion of comments in mental health subreddits by ideology',
+) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
-
-(mh_1 + mh_2)/(mh_3 + mh_4)
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/mh_eda.pdf", 
+       width = 32, height = 20, units = "cm")
 
 #  Might expect to be right
 
 bitcoin <- data %>% 
   select('user.flair','Bitcoin') %>% 
   ggplot(aes(x=reorder(user.flair, -Bitcoin), y = Bitcoin)) + 
-  geom_col(color = 'black', fill = 'yellow') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/Bitcoin') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -63,7 +59,7 @@ bitcoin <- data %>%
 wsb <- data %>% 
   select('user.flair','wallstreetbets') %>% 
   ggplot(aes(x=reorder(user.flair, -wallstreetbets), y = wallstreetbets)) + 
-  geom_col(color = 'black', fill = 'yellow') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/wallstreetbets') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -72,7 +68,7 @@ wsb <- data %>%
 cons <- data %>% 
   select('user.flair','conspiracy') %>% 
   ggplot(aes(x=reorder(user.flair, -conspiracy), y = conspiracy)) + 
-  geom_col(color = 'black', fill = 'yellow') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/conspiracy') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -80,11 +76,11 @@ cons <- data %>%
 
 
 (bitcoin + wsb + cons)  + plot_annotation(
-  title = 'Proportion of comments in interest subreddits by ideology',
+  title = 'Proportion of comments in subreddits you may associate with conservative views',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/lib_eda.pdf", 
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/rightwing_eda.pdf", 
        width = 32, height = 20, units = "cm")
 
 # Might expect to be left wing 
@@ -116,72 +112,20 @@ twox <-data %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-lgbt + ahsr +twox
-
-# Incel based subreddits
-
-mra <- data %>% 
-  select('user.flair','MensRights') %>% 
-  ggplot(aes(x=reorder(user.flair, -MensRights), y = MensRights)) + 
-  geom_col(color = 'black', fill = 'turquoise2') +
-  ylab('r/MensRights') +
-  xlab('') +
+(lgbt + ahsr +twox) + plot_annotation(
+  title = 'Proportion of comments in subreddits you may associate with progressive views',
+) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
-fmds <- data %>% 
-  select('user.flair','FemaleDatingStrategy') %>% 
-  ggplot(aes(x=reorder(user.flair, -FemaleDatingStrategy), y = FemaleDatingStrategy)) + 
-  geom_col(color = 'black', fill = 'magenta') +
-  ylab('r/FemaleDatingStrategy') +
-  xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
-mgtow <- data %>% 
-  select('user.flair','MGTOW2') %>% 
-  ggplot(aes(x=reorder(user.flair, -MGTOW2), y = MGTOW2)) + 
-  geom_col(color = 'black', fill = 'turquoise2') +
-  ylab('r/MGTOW2') +
-  xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-  
-mra + fmds + mgtow
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/leftwing_eda.pdf", 
+       width = 32, height = 20, units = "cm")
 
 # Random interests 
-
-anime <- data %>% 
-  select('user.flair','anime') %>% 
-  ggplot(aes(x=reorder(user.flair, -anime), y = anime)) + 
-  geom_col(color = 'black', fill = 'magenta') +
-  ylab('r/anime') +
-  xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
-mma <- data %>% 
-  select('user.flair','MMA') %>% 
-  ggplot(aes(x=reorder(user.flair, -MMA), y = MMA)) + 
-  geom_col(color = 'black', fill = 'magenta') +
-  ylab('r/MMA') +
-  xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
-minecraft <- data %>% 
-  select('user.flair','Minecraft') %>% 
-  ggplot(aes(x=reorder(user.flair, -Minecraft), y = Minecraft)) + 
-  geom_col(color = 'black', fill = 'magenta') +
-  ylab('r/Minecraft') +
-  xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
 movies <- data %>% 
   select('user.flair','movies') %>% 
   ggplot(aes(x=reorder(user.flair, -movies), y = movies)) + 
-  geom_col(color = 'black', fill = 'magenta') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/movies') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -190,7 +134,7 @@ movies <- data %>%
 gaming <- data %>% 
   select('user.flair','gaming') %>% 
   ggplot(aes(x=reorder(user.flair, -gaming), y = gaming)) + 
-  geom_col(color = 'black', fill = 'magenta') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/gaming') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
@@ -199,19 +143,19 @@ gaming <- data %>%
 sports <- data %>% 
   select('user.flair','sports') %>% 
   ggplot(aes(x=reorder(user.flair, -sports), y = sports)) + 
-  geom_col(color = 'black', fill = 'magenta') +
+  geom_col(color = 'black', fill = 'cyan') +
   ylab('r/sports') +
   xlab('') +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
-(anime + mma + minecraft)/(movies + gaming + sports) + 
+(movies + gaming + sports) + 
   plot_annotation(
-    title = 'Proportion of comments in interest-related subreddits by ideology',
+    title = 'Proportion of comments in hobby related subreddits',
   ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/interests_eda.pdf", 
+ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/interests_eda.pdf", 
        width = 32, height = 20, units = "cm")
 
 ################################################################################
@@ -237,7 +181,7 @@ d1 <- data %>% select('user.flair','Bitcoin') %>%
   geom_density(alpha = 1/3) +
   ylab('') +
   xlab('Log comments in R/Bitcoin') +
-  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  scale_fill_manual(values=c('cyan', 'cyan'), name = 'Ideology') + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
@@ -258,7 +202,7 @@ d2 <- data %>% select('user.flair','movies') %>%
   geom_density(alpha = 1/2) +
   ylab('') +
   xlab('Log comments in R/movies') +
-  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  scale_fill_manual(values=c('cyan', 'cyan'), name = 'Ideology') + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
 
@@ -282,14 +226,17 @@ data %>% select('user.flair','Bitcoin') %>%
 
 data %>% 
   mutate(
-    log = log(MensRights)) %>% 
+    log = log(Bitcoin)) %>% 
   ggplot( aes(x= user.flair, y = log, fill = user.flair)) +
-  geom_boxplot()
-
+  geom_boxplot(fill = 'cyan')+ 
   ylab('') +
   xlab('Log comments in R/movies') +
-  scale_fill_manual(values=c('magenta', 'cyan'), name = 'Ideology') + 
+  scale_fill_manual(values=c('cyan', 'cyan'), name = 'Ideology') + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black')) + 
+  plot_annotation(
+    title = 'Box plot of log comments in hobby related subreddits',
+  ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16, color = 'black'))
-
 

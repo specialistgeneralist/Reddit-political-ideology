@@ -111,7 +111,7 @@ model_log = {}
 scorer = make_scorer(roc_auc_score, needs_proba = True, multi_class='ovr', average ='weighted')
 
 # Set up object for truncated SVD 
-svd = TruncatedSVD(n_components = 1000, random_state = 0)
+svd = TruncatedSVD(n_components = 500, random_state = 0)
 
 # Set up binarizer
 binarizer = Binarizer()
@@ -458,28 +458,6 @@ results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
 results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/Binary_econ_int_results.csv')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

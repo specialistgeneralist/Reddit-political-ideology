@@ -184,100 +184,18 @@ data.replace('authright','right', inplace=True)
 X = data['comment']
 y = data['user.flair']
 
+# Ens data uis a string
+X = X.apply(lambda x: np.str_(x))
+
 # Split data into training and testing sets 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
+
+# https://zeugma.readthedocs.io/en/stable/readme.html#training-embeddings
+from zeugma.embeddings import EmbeddingTransformer
 glove = EmbeddingTransformer('glove')
-X_train = glove.transform(X_train)
 
-linear_svc.fit(X_train, y_train)
-
-X_test = glove.transform(X_test)
-linear_svc.predict(X_test)
-
-
-accuracy_score(y_test, linear_svc.predict(X_test))
-
-
-
-
-
-
-fasttext.util.download_model('en', if_exists='ignore')  # English
-model = fasttext.load_facebook_vectors('cc.en.300.bin')
-
-def AverageFT(comments):
-  words = comments.split()
-  mean_FT = (np.sum([np.array([model.wv[word]]) for word in words], axis=0)/len(words)).tolist()[0]
-  return mean_FT 
-
-
-X_test = pd.DataFrame(X_test.apply(AverageFT).to_list())
-X_train = pd.DataFrame(X_train.apply(AverageFT).to_list())
-
-###################### ZeroR #########################
-# Fit the model
-zero_r.fit(X_train, y_train)
-  
-# Record best model results 
-zero_r_predict = zero_r.predict(X_test)
-accuracy_log['zero_r_fasttext'] = accuracy_score(y_test, zero_r_predict)
-  
-###################### Linear SVC #########################
-  
-# Set up pipeline
-fasttext_svc_pipeline = Pipeline(steps=[
-    ('linear_svc', linear_svc)
-  ])
-  
-  # Set up grid for hyperparameter optimization 
-fasttext_svc_param_grid = {
-    'linear_svc__C': [10, 100],
-    'linear_svc__class_weight': [None, 'balanced']
-  }
-  
-  
-fasttext_svc_search = GridSearchCV(fasttext_svc_pipeline,
-                                     fasttext_svc_param_grid,
-                                     n_jobs =-1,
-                                     scoring = 'accuracy',
-                                     cv = custom_cv)
-  
-fasttext_svc_search.fit(X_train, y_train)
-  
-# Record best model results 
-fasttext_svc_predict = fasttext_svc_search.predict(X_test)
-accuracy_log['fasttext_svc'] = accuracy_score(y_test, fasttext_svc_predict)
-  
-model_log['fasttext_svc'] = str(fasttext_svc_search.best_estimator_)
-  
-
-
-
-
-
-
-AverageFT(X_train[0])
-
-data['comment'][0:100].apply(AverageFT)
-
-AverageFT(X_train[0])
-AverageFT(X_train[1])
-AverageFT(X_train[2])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+glove.transform(['what is zeugma', 'a figure of speech'])
 
 
 

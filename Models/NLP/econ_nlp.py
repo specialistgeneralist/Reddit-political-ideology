@@ -35,6 +35,7 @@ zero_r = DummyClassifier(strategy = "most_frequent")
 # Set up object for truncated SVD 
 svd = TruncatedSVD(random_state = 0)
 
+
 # Set up OVR Linear SVM to use in all models 
 linear_svc = LinearSVC(loss = 'hinge',
                        multi_class = 'ovr',
@@ -96,7 +97,7 @@ clean_data.replace('authright','right', inplace=True)
 X = clean_data['comment']
 y = clean_data['user.flair']
 
-# Ens data uis a string
+# Ensure data is a string
 X = X.apply(lambda x: np.str_(x))
 
 # Split data into training and testing sets 
@@ -142,8 +143,6 @@ tf_idf_svc_search.fit(X_train, y_train)
 tf_idf_svc_predict = tf_idf_svc_search.predict(X_test)
 accuracy_log['tf_idf_svc'] = accuracy_score(y_test, tf_idf_svc_predict)
 
-tf_idf_svc_predict_prob = tf_idf_svc_search.predict_proba(X_test)
-auc_log['tf_idf_svc'] = roc_auc_score(y_test, tf_idf_svc_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
 
@@ -154,6 +153,12 @@ model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
 ################################################################################
 
 data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
+
+data = data[data['user.flair'] != ':CENTG: - Centrist']
+data = data[data['user.flair'] != ':centrist: - Centrist']
+data = data[data['user.flair'] != ':centrist: - Grand Inquisitor']
+data = data[data['user.flair'] != ':auth: - AuthCenter']
+data = data[data['user.flair'] != ':lib: - LibCenter']
 
 # Recode flair labels to avoid doubling up on flairs 
 data.replace(':CENTG: - Centrist','centrist', inplace=True)
@@ -186,19 +191,51 @@ y = data['user.flair']
 
 # Ens data uis a string
 X = X.apply(lambda x: np.str_(x))
+X = X.apply(lambda x: x.lower())
 
 # Split data into training and testing sets 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
 
 # https://zeugma.readthedocs.io/en/stable/readme.html#training-embeddings
-from zeugma.embeddings import EmbeddingTransformer
+# from zeugma.embeddings import EmbeddingTransformer
 glove = EmbeddingTransformer('glove')
 
-glove.transform(['what is zeugma', 'a figure of speech'])
+X_train = glove.transform(X_train)
+X_test = glove.transform(X_test)
+
+###################### ZeroR #########################
+# Fit the model
+zero_r.fit(X_train, y_train)
+
+# Record best model results 
+zero_r_predict = zero_r.predict(X_test)
+accuracy_log['zero_r_glove'] = accuracy_score(y_test, zero_r_predict)
+
+###################### Linear SVC #########################
+
+# Set up pipeline
+glove_svc_pipeline = Pipeline(steps = [
+  ('linear_svc', linear_svc)
+])
+
+# Set up grid for hyperparameter optimization 
+glove_svc_param_grid = {
+  'linear_svc__C': [10, 1]
+}
 
 
+glove_svc_search = GridSearchCV(glove_svc_pipeline,
+                                 glove_svc_param_grid,
+                                 n_jobs =-1,
+                                 scoring = 'accuracy',
+                                 cv = custom_cv)
 
+glove_svc_search.fit(X_train, y_train)
 
+# Record best model results 
+glove_svc_predict = glove_svc_search.predict(X_test)
+accuracy_log['glove_svc'] = accuracy_score(y_test, glove_svc_predict)
 
+model_log['glove_svc'] = str(glove_svc_search.best_estimator_)
 

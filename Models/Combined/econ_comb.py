@@ -8,17 +8,14 @@ import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedShuffleSplit
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA, TruncatedSVD
-from sklearn.linear_model import SGDClassifier
-from sklearn.svm import LinearSVC, SVC
+from sklearn.decomposition import TruncatedSVD
+from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import Binarizer
 from sklearn.compose import ColumnTransformer
 from zeugma.embeddings import EmbeddingTransformer
 from sklearn.linear_model import LogisticRegression
-
-
 
 ################################################################################
 ################################################################################
@@ -166,4 +163,32 @@ ovr_logreg_pipeline = Pipeline(steps=[('processor', processor),
                                ('ovr_logreg', ovr_logreg)])
 
 
+ovr_logreg_param_grid = {
+  'processor__int__binarizer': ['passthrough', binarizer],
+  'processor__text__tf_idf_vec__min_df': [0.01],  
+  'processor__text__tf_idf_vec__max_df': [0.9],  
+  'processor__text__tf_idf_vec__max_features': [10000],  
+  'svd__n_classes': [500],
+  'ovr_logreg__class_weight': ['balanced', None]
+}
 
+
+
+ovr_logreg_search = GridSearchCV(ovr_logreg_pipeline,
+                                 ovr_logreg_param_grid,
+                                 n_jobs =-1,
+                                 scoring = 'accuracy',
+                                 cv = custom_cv)
+
+ovr_logreg_search.fit(X_train, y_train)
+
+# Record best model results 
+ovr_logreg_predict = ovr_logreg_search.predict(X_test)
+accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
+
+from sklearn import set_config
+
+set_config(display='diagram')
+ovr_logreg_pipeline
+
+# https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html

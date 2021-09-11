@@ -167,8 +167,8 @@ ovr_logreg_param_grid = {
   'processor__int__binarizer': ['passthrough', binarizer],
   'processor__text__tf_idf_vec__min_df': [0.01],  
   'processor__text__tf_idf_vec__max_df': [0.9],  
-  'processor__text__tf_idf_vec__max_features': [10000],  
-  'svd__n_classes': [500],
+  'processor__text__tf_idf_vec__max_features': [100000],  
+  'svd__n_components': [500],
   'ovr_logreg__class_weight': ['balanced', None]
 }
 
@@ -186,9 +186,7 @@ ovr_logreg_search.fit(X_train, y_train)
 ovr_logreg_predict = ovr_logreg_search.predict(X_test)
 accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
 
-from sklearn import set_config
+ovr_logreg_predict_prob = ovr_logreg_search.predict_proba(X_test)
+auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average = 'weighted', multi_class = 'ovr')
 
-set_config(display='diagram')
-ovr_logreg_pipeline
-
-# https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html
+model_log['ovr_logreg'] = str(ovr_logreg_search.best_estimator_)

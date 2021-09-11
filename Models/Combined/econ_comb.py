@@ -25,8 +25,12 @@ from sklearn.linear_model import LogisticRegression
 
 clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
 clean_data.drop(['Unnamed: 0'], axis=1, inplace=True)
-int_data = pd.read_parquet('/Volumes/Elements/First_scrape/user-interaction.parquet')
 
+int_data = pd.read_parquet('/Volumes/Elements/First_scrape/user-interaction.parquet')
+political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
+                  'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
+                  'republicans', 'conservatives']
+int_data.drop(columns = political_subs, inplace = True)
 
 # Remove columns with insufficient interaction 
 # This loop will remove subreddits with less than 50 comments and users with less than 50 comments until no row
@@ -190,3 +194,13 @@ ovr_logreg_predict_prob = ovr_logreg_search.predict_proba(X_test)
 auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 model_log['ovr_logreg'] = str(ovr_logreg_search.best_estimator_)
+
+
+
+
+from sklearn import set_config
+
+set_config(display='diagram')
+ovr_logreg_pipeline
+
+# https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html

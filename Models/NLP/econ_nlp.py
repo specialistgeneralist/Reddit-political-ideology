@@ -8,9 +8,9 @@ import numpy as np
 from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedShuffleSplit
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
-from sklearn.decomposition import PCA, TruncatedSVD
+from sklearn.decomposition import TruncatedSVD
 from sklearn.linear_model import SGDClassifier
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.dummy import DummyClassifier
 from zeugma.embeddings import EmbeddingTransformer
@@ -33,7 +33,7 @@ scorer = make_scorer(roc_auc_score, needs_proba = True, multi_class='ovr', avera
 zero_r = DummyClassifier(strategy = "most_frequent")
 
 # Set up object for truncated SVD 
-svd = TruncatedSVD(random_state = 0)
+svd = TruncatedSVD(random_state = 0, n_components=500)
 
 
 # Set up OVR Linear SVM to use in all models 
@@ -42,13 +42,6 @@ linear_svc = LinearSVC(loss = 'hinge',
                        random_state = 0
                        )
 
-# Set up 
-SGDClassifier(loss='hinge',
-              penalty='l2',
-              alpha=1e-3, 
-              random_state=0, max_iter=5, tol=None)
-
-from sklearn.linear_model import SGDClassifier
 
 # Set up custom train/validate splot
 custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
@@ -62,11 +55,11 @@ custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state =
 
 clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
 
-clean_data = clean_data[clean_data['user.flair'] != ':CENTG: - Centrist']
-clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Centrist']
-clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Grand Inquisitor']
-clean_data = clean_data[clean_data['user.flair'] != ':auth: - AuthCenter']
-clean_data = clean_data[clean_data['user.flair'] != ':lib: - LibCenter']
+# clean_data = clean_data[clean_data['user.flair'] != ':CENTG: - Centrist']
+# clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Centrist']
+# clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Grand Inquisitor']
+# clean_data = clean_data[clean_data['user.flair'] != ':auth: - AuthCenter']
+# clean_data = clean_data[clean_data['user.flair'] != ':lib: - LibCenter']
 
 # Recode flair labels to avoid doubling up on flairs 
 clean_data.replace(':CENTG: - Centrist','centrist', inplace=True)
@@ -82,7 +75,7 @@ clean_data.replace(':auth: - AuthCenter','authcenter', inplace=True)
 clean_data.replace(':authleft: - AuthLeft','authleft', inplace=True)
 clean_data.replace(':authright: - AuthRight','authright', inplace=True)
 
-# Recode to economic flair only
+# Recode to economic flair onlclean_data
 clean_data.replace('centrist', 'center', inplace=True)
 clean_data.replace('left', 'left', inplace=True)
 clean_data.replace('libright', 'right', inplace=True)
@@ -91,7 +84,8 @@ clean_data.replace('libleft', 'left', inplace=True)
 clean_data.replace('libcenter', 'center', inplace=True)
 clean_data.replace('authcenter', 'center', inplace=True)
 clean_data.replace('authleft', 'left', inplace=True)
-clean_data.replace('authright','right', inplace=True)
+clean_data.replace('authright','right', inplace=True)    
+
 
 # Assign features and response appropriately (for TF-IDF we use the cleaned comments)
 X = clean_data['comment']
@@ -118,15 +112,17 @@ accuracy_log['zero_r_tfidf'] = accuracy_score(y_test, zero_r_predict)
 
 # Set up pipeline
 tf_idf_svc_pipeline = Pipeline(steps = [
-  ('tf_idf_vec', tf_idf_vec ),   
+  ('tf_idf_vec', tf_idf_vec),   
+  ('svd', svd),
   ('linear_svc', linear_svc)
 ])
 
 # Set up grid for hyperparameter optimization 
 tf_idf_svc_param_grid = {
-  'tf_idf_vec__min_df': [0.01],  
-  'tf_idf_vec__max_df': [0.9],  
-  'tf_idf_vec__max_features': [10000],  
+  'svd': ['passthrough', svd],
+  'tf_idf_vec__min_df': [0.01, 0.05],  
+  'tf_idf_vec__max_df': [0.9, 0.95],  
+  'tf_idf_vec__max_features': [10000, 100000],  
   'linear_svc__C': [10, 1]
 }
 
@@ -154,11 +150,11 @@ model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
 
 data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
 
-data = data[data['user.flair'] != ':CENTG: - Centrist']
-data = data[data['user.flair'] != ':centrist: - Centrist']
-data = data[data['user.flair'] != ':centrist: - Grand Inquisitor']
-data = data[data['user.flair'] != ':auth: - AuthCenter']
-data = data[data['user.flair'] != ':lib: - LibCenter']
+# data = data[data['user.flair'] != ':CENTG: - Centrist']
+# data = data[data['user.flair'] != ':centrist: - Centrist']
+# data = data[data['user.flair'] != ':centrist: - Grand Inquisitor']
+# data = data[data['user.flair'] != ':auth: - AuthCenter']
+# data = data[data['user.flair'] != ':lib: - LibCenter']
 
 # Recode flair labels to avoid doubling up on flairs 
 data.replace(':CENTG: - Centrist','centrist', inplace=True)

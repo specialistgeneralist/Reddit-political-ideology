@@ -143,6 +143,8 @@ accuracy_log['tf_idf_svc'] = accuracy_score(y_test, tf_idf_svc_predict)
 
 model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
 
+del clean_data
+
 ################################################################################
 ################################################################################
 # EMBEDDING
@@ -229,11 +231,16 @@ accuracy_log['embed_svc'] = accuracy_score(y_test, embed_svc_predict)
 
 model_log['embed_svc'] = str(embed_svc_search.best_estimator_)
 
+del data
+
 ################################################################################
 ################################################################################
 # TF-IDF + EMBEDDING
 ################################################################################
 ################################################################################
+
+data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
+clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
 
 comb_data = pd.merge(clean_data, data, on='user')
 comb_data.drop(['user.flair_y', 'Unnamed: 0_x', 'Unnamed: 0_y'],axis=1, inplace = True)
@@ -241,6 +248,7 @@ comb_data.rename(columns={'user.flair_x': 'user.flair',
                           'comment_y': 'comment_embed',
                           'comment_x': 'comment_tfidf'}, inplace = True)
 
+del data, clean_data
 
 # comb_data = comb_data[comb_data['user.flair'] != ':CENTG: - Centrist']
 # comb_data = comb_data[comb_data['user.flair'] != ':centrist: - Centrist']
@@ -275,11 +283,14 @@ comb_data.replace('authright','right', inplace=True)
 
 # Assign features and response appropriately (for TF-IDF we use the cleaned comments)
 X = comb_data[['comment_embed', 'comment_tfidf']]
-y = data['user.flair']
+y = comb_data['user.flair']
 
 # Ensure data is a string
 X['comment_embed'] = X['comment_embed'].apply(lambda x: np.str_(x))
 X['comment_tfidf'] = X['comment_tfidf'].apply(lambda x: np.str_(x))
+
+# Split data into training and testing sets 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
 # Create processor for both types of text data
 processor = ColumnTransformer(
@@ -341,19 +352,3 @@ results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_nlp_result
 # Choose good HPs for everything
 # Proof read
 # Autogenerate results 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

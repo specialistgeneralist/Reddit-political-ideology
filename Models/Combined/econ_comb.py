@@ -9,83 +9,12 @@ from sklearn.model_selection import GridSearchCV, train_test_split, StratifiedSh
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import TruncatedSVD
+from sklearn.linear_model import SGDClassifier
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.dummy import DummyClassifier
-from sklearn.preprocessing import Binarizer
 from sklearn.compose import ColumnTransformer
 from zeugma.embeddings import EmbeddingTransformer
-from sklearn.linear_model import LogisticRegression
-
-################################################################################
-################################################################################
-# TF-IDF models
-################################################################################
-################################################################################
-
-clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
-clean_data.drop(['Unnamed: 0'], axis=1, inplace=True)
-
-int_data = pd.read_parquet('/Volumes/Elements/First_scrape/user-interaction.parquet')
-political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
-                  'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
-                  'republicans', 'conservatives']
-int_data.drop(columns = political_subs, inplace = True)
-
-# Remove columns with insufficient interaction 
-# This loop will remove subreddits with less than 50 comments and users with less than 50 comments until no row
-# or column violates this condition
-while True:
-  print('in: '+str(int_data.shape))
-  size = int_data.size 
-  col_sum = int_data.sum(axis = 0, numeric_only = True)
-  row_sum = int_data.sum(axis = 1, numeric_only = True)
-  bad_cols = col_sum[col_sum <= 50].index
-  bad_rows = row_sum[row_sum <= 50].index
-  int_data.drop(index = bad_rows, columns = bad_cols, inplace = True)
-  print('out: ' + str(int_data.shape))
-  if int_data.size == size:
-      break
-
-
-data = pd.merge(clean_data, int_data, on='user')
-data.drop(['user.flair_y'],axis=1, inplace = True)
-data.rename(columns={'user.flair_x': 'user.flair'}, inplace = True)
-
-data['comment'] = data['comment'].apply(lambda x: np.str_(x))
-
-y = data['user.flair']    
-
-features = data.columns[2:]
-X = data[features]
-
-# Recode flair labels to avoid 
-y.replace(':CENTG: - Centrist','centrist', inplace=True)
-y.replace(':centrist: - Centrist','centrist', inplace=True)
-y.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
-y.replace(':left: - Left', 'left', inplace=True)
-y.replace(':libright: - LibRight', 'libright', inplace=True)
-y.replace(':libright2: - LibRight', 'libright', inplace=True)
-y.replace(':right: - Right',  'right', inplace=True)
-y.replace(':libleft: - LibLeft', 'libleft', inplace=True)
-y.replace(':lib: - LibCenter', 'libcenter', inplace=True)
-y.replace(':auth: - AuthCenter','authcenter', inplace=True)
-y.replace(':authleft: - AuthLeft','authleft', inplace=True)
-y.replace(':authright: - AuthRight','authright', inplace=True)
-
-# Recode to economic flair only
-y.replace('centrist', 'center', inplace=True)
-y.replace('left', 'left', inplace=True)
-y.replace('libright', 'right', inplace=True)
-y.replace('right','right', inplace=True)
-y.replace('libleft', 'left', inplace=True)
-y.replace('libcenter', 'center', inplace=True)
-y.replace('authcenter', 'center', inplace=True)
-y.replace('authleft', 'left', inplace=True)
-y.replace('authright','right', inplace=True)                    
-
-# Split data into training and testing sets 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
 ################################################################################
 ################################################################################
@@ -104,43 +33,75 @@ scorer = make_scorer(roc_auc_score, needs_proba = True, multi_class='ovr', avera
 # Set up ZeroR classifier 
 zero_r = DummyClassifier(strategy = "most_frequent")
 
-# Set up binarizer
-binarizer = Binarizer()
-
 # Set up object for truncated SVD 
-svd = TruncatedSVD(random_state = 0, n_components = 200)
+svd = TruncatedSVD(random_state = 0, n_components=500)
 
-# Set up TF-IDF object to create vocab, count and transform data to TF-IDF features
-tf_idf_vec = TfidfVectorizer(smooth_idf = True, use_idf = True)
+
+# Set up OVR Linear SVM to use in all models 
+linear_svc = LinearSVC(loss = 'hinge',
+                       multi_class = 'ovr',
+                       random_state = 0
+                       )
+
 
 # Set up custom train/validate splot
 custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state = 0)
 
-################################################################################
-# Create general preprocessing pipeline
-################################################################################
-
-# Create pipeline of preprocessing steps from user-interaction data
-int_features = data.columns[3:]
-int_transformer = Pipeline(steps = [
-  ('binarizer', binarizer)
-])
-
-# Create pipeline for feature extraction from comments
-text_transformer = Pipeline(steps = [
-  ('tf_idf_vec', tf_idf_vec )
-])
-
-# Create preprocessor 
-processor = ColumnTransformer(
-  transformers=[
-    ('int', int_transformer, int_features),
-    ('text', text_transformer, 'comment')])
 
 ################################################################################
-# ZeroR -- baseline
+################################################################################
+# TF-IDF models
+################################################################################
 ################################################################################
 
+clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+
+# clean_data = clean_data[clean_data['user.flair'] != ':CENTG: - Centrist']
+# clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Centrist']
+# clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Grand Inquisitor']
+# clean_data = clean_data[clean_data['user.flair'] != ':auth: - AuthCenter']
+# clean_data = clean_data[clean_data['user.flair'] != ':lib: - LibCenter']
+
+# Recode flair labels to avoid doubling up on flairs 
+clean_data.replace(':CENTG: - Centrist','centrist', inplace=True)
+clean_data.replace(':centrist: - Centrist','centrist', inplace=True)
+clean_data.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
+clean_data.replace(':left: - Left', 'left', inplace=True)
+clean_data.replace(':libright: - LibRight', 'libright', inplace=True)
+clean_data.replace(':libright2: - LibRight', 'libright', inplace=True)
+clean_data.replace(':right: - Right',  'right', inplace=True)
+clean_data.replace(':libleft: - LibLeft', 'libleft', inplace=True)
+clean_data.replace(':lib: - LibCenter', 'libcenter', inplace=True)
+clean_data.replace(':auth: - AuthCenter','authcenter', inplace=True)
+clean_data.replace(':authleft: - AuthLeft','authleft', inplace=True)
+clean_data.replace(':authright: - AuthRight','authright', inplace=True)
+
+# Recode to economic flair onlclean_data
+clean_data.replace('centrist', 'center', inplace=True)
+clean_data.replace('left', 'left', inplace=True)
+clean_data.replace('libright', 'right', inplace=True)
+clean_data.replace('right','right', inplace=True)
+clean_data.replace('libleft', 'left', inplace=True)
+clean_data.replace('libcenter', 'center', inplace=True)
+clean_data.replace('authcenter', 'center', inplace=True)
+clean_data.replace('authleft', 'left', inplace=True)
+clean_data.replace('authright','right', inplace=True)    
+
+
+# Assign features and response appropriately (for TF-IDF we use the cleaned comments)
+X = clean_data['comment']
+y = clean_data['user.flair']
+
+# Ensure data is a string
+X = X.apply(lambda x: np.str_(x))
+
+# Split data into training and testing sets 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+# Set up TF-IDF object to create vocab, count and transform data to TF-IDF features
+tf_idf_vec = TfidfVectorizer(smooth_idf = True, use_idf = True)
+
+###################### ZeroR #########################
 # Fit the model
 zero_r.fit(X_train, y_train)
 
@@ -148,59 +109,235 @@ zero_r.fit(X_train, y_train)
 zero_r_predict = zero_r.predict(X_test)
 accuracy_log['zero_r'] = accuracy_score(y_test, zero_r_predict)
 
-################################################################################
-# OVR Logistic regression - no penalty
-################################################################################
+###################### Linear SVC #########################
 
-# Set up OVR logistic regression object
-ovr_logreg = LogisticRegression(solver = 'saga',
-                                max_iter = 1000,
-                                class_weight = 'balanced',
-                                penalty = 'none',
-                                multi_class = 'ovr',
-                                n_jobs = -1)
+# Set up pipeline
+tf_idf_svc_pipeline = Pipeline(steps = [
+  ('tf_idf_vec', tf_idf_vec),   
+  ('svd', svd),
+  ('linear_svc', linear_svc)
+])
 
-
-# OVR logistic regresssion pipeline
-ovr_logreg_pipeline = Pipeline(steps=[('processor', processor),
-                               ('svd', svd),
-                               ('ovr_logreg', ovr_logreg)])
-
-
-ovr_logreg_param_grid = {
-  'processor__int__binarizer': ['passthrough', binarizer],
-  'processor__text__tf_idf_vec__min_df': [0.01],  
-  'processor__text__tf_idf_vec__max_df': [0.9],  
-  'processor__text__tf_idf_vec__max_features': [100000],  
-  'svd__n_components': [500],
-  'ovr_logreg__class_weight': ['balanced', None]
+# Set up grid for hyperparameter optimization 
+tf_idf_svc_param_grid = {
+  'svd': ['passthrough', svd],
+  'tf_idf_vec__min_df': [0.01, 0.05],  
+  'tf_idf_vec__max_df': [0.9, 0.95],  
+  'tf_idf_vec__max_features': [10000, 100000],  
+  'linear_svc__C': [10, 1]
 }
 
 
+tf_idf_svc_search = GridSearchCV(tf_idf_svc_pipeline,
+                                    tf_idf_svc_param_grid,
+                                    n_jobs =-1,
+                                    scoring = 'accuracy',
+                                    cv = custom_cv)
 
-ovr_logreg_search = GridSearchCV(ovr_logreg_pipeline,
-                                 ovr_logreg_param_grid,
+tf_idf_svc_search.fit(X_train, y_train)
+
+# Record best model results 
+tf_idf_svc_predict = tf_idf_svc_search.predict(X_test)
+accuracy_log['tf_idf_svc'] = accuracy_score(y_test, tf_idf_svc_predict)
+
+
+model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
+
+################################################################################
+################################################################################
+# EMBEDDING
+################################################################################
+################################################################################
+
+# https://github.com/RaRe-Technologies/gensim-data
+# import gensim.downloader
+# print(list(gensim.downloader.info()['models'].keys()))
+# glove_vectors = gensim.downloader.load('glove-twitter-200')
+# gensim.downloader.load('word2vec-google-news-300')
+
+data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
+
+# data = data[data['user.flair'] != ':CENTG: - Centrist']
+# data = data[data['user.flair'] != ':centrist: - Centrist']
+# data = data[data['user.flair'] != ':centrist: - Grand Inquisitor']
+# data = data[data['user.flair'] != ':auth: - AuthCenter']
+# data = data[data['user.flair'] != ':lib: - LibCenter']
+
+# Recode flair labels to avoid doubling up on flairs 
+data.replace(':CENTG: - Centrist','centrist', inplace=True)
+data.replace(':centrist: - Centrist','centrist', inplace=True)
+data.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
+data.replace(':left: - Left', 'left', inplace=True)
+data.replace(':libright: - LibRight', 'libright', inplace=True)
+data.replace(':libright2: - LibRight', 'libright', inplace=True)
+data.replace(':right: - Right',  'right', inplace=True)
+data.replace(':libleft: - LibLeft', 'libleft', inplace=True)
+data.replace(':lib: - LibCenter', 'libcenter', inplace=True)
+data.replace(':auth: - AuthCenter','authcenter', inplace=True)
+data.replace(':authleft: - AuthLeft','authleft', inplace=True)
+data.replace(':authright: - AuthRight','authright', inplace=True)
+
+# Recode to economic flair only
+data.replace('centrist', 'center', inplace=True)
+data.replace('left', 'left', inplace=True)
+data.replace('libright', 'right', inplace=True)
+data.replace('right','right', inplace=True)
+data.replace('libleft', 'left', inplace=True)
+data.replace('libcenter', 'center', inplace=True)
+data.replace('authcenter', 'center', inplace=True)
+data.replace('authleft', 'left', inplace=True)
+data.replace('authright','right', inplace=True)
+
+# Assign features and response appropriately (for TF-IDF we use the cleaned comments)
+X = data['comment']
+y = data['user.flair']
+
+# Ensure data is a string
+X = X.apply(lambda x: np.str_(x))
+
+# Split data into training and testing sets 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+# Create embeddings transformer
+embed = EmbeddingTransformer('word2vec-google-news-300')
+
+###################### Linear SVC #########################
+
+# Set up pipeline
+embed_svc_pipeline = Pipeline(steps = [
+  ('embed', embed),
+  ('linear_svc', linear_svc)
+])
+
+# Set up grid for hyperparameter optimization 
+embed_svc_param_grid = {
+  'linear_svc__C': [10, 1]
+}
+
+
+embed_svc_search = GridSearchCV(embed_svc_pipeline,
+                                 embed_svc_param_grid,
                                  n_jobs =-1,
                                  scoring = 'accuracy',
                                  cv = custom_cv)
 
-ovr_logreg_search.fit(X_train, y_train)
+embed_svc_search.fit(X_train, y_train)
 
 # Record best model results 
-ovr_logreg_predict = ovr_logreg_search.predict(X_test)
-accuracy_log['ovr_logreg'] = accuracy_score(y_test, ovr_logreg_predict)
+embed_svc_predict = embed_svc_search.predict(X_test)
+accuracy_log['embed_svc'] = accuracy_score(y_test, embed_svc_predict)
 
-ovr_logreg_predict_prob = ovr_logreg_search.predict_proba(X_test)
-auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average = 'weighted', multi_class = 'ovr')
+model_log['embed_svc'] = str(embed_svc_search.best_estimator_)
 
-model_log['ovr_logreg'] = str(ovr_logreg_search.best_estimator_)
+################################################################################
+################################################################################
+# TF-IDF + EMBEDDING
+################################################################################
+################################################################################
+
+comb_data = pd.merge(clean_data, data, on='user')
+comb_data.drop(['user.flair_y', 'Unnamed: 0_x', 'Unnamed: 0_y'],axis=1, inplace = True)
+comb_data.rename(columns={'user.flair_x': 'user.flair',
+                          'comment_y': 'comment_embed',
+                          'comment_x': 'comment_tfidf'}, inplace = True)
+
+
+# comb_data = comb_data[comb_data['user.flair'] != ':CENTG: - Centrist']
+# comb_data = comb_data[comb_data['user.flair'] != ':centrist: - Centrist']
+# comb_data = comb_data[comb_data['user.flair'] != ':centrist: - Grand Inquisitor']
+# comb_data = comb_data[comb_data['user.flair'] != ':auth: - AuthCenter']
+# comb_data = comb_data[comb_data['user.flair'] != ':lib: - LibCenter']
+
+# Recode flair labels to avoid doubling up on flairs 
+comb_data.replace(':CENTG: - Centrist','centrist', inplace=True)
+comb_data.replace(':centrist: - Centrist','centrist', inplace=True)
+comb_data.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
+comb_data.replace(':left: - Left', 'left', inplace=True)
+comb_data.replace(':libright: - LibRight', 'libright', inplace=True)
+comb_data.replace(':libright2: - LibRight', 'libright', inplace=True)
+comb_data.replace(':right: - Right',  'right', inplace=True)
+comb_data.replace(':libleft: - LibLeft', 'libleft', inplace=True)
+comb_data.replace(':lib: - LibCenter', 'libcenter', inplace=True)
+comb_data.replace(':auth: - AuthCenter','authcenter', inplace=True)
+comb_data.replace(':authleft: - AuthLeft','authleft', inplace=True)
+comb_data.replace(':authright: - AuthRight','authright', inplace=True)
+
+# Recode to economic flair only
+comb_data.replace('centrist', 'center', inplace=True)
+comb_data.replace('left', 'left', inplace=True)
+comb_data.replace('libright', 'right', inplace=True)
+comb_data.replace('right','right', inplace=True)
+comb_data.replace('libleft', 'left', inplace=True)
+comb_data.replace('libcenter', 'center', inplace=True)
+comb_data.replace('authcenter', 'center', inplace=True)
+comb_data.replace('authleft', 'left', inplace=True)
+comb_data.replace('authright','right', inplace=True)
+
+# Assign features and response appropriately (for TF-IDF we use the cleaned comments)
+X = comb_data[['comment_embed', 'comment_tfidf']]
+y = data['user.flair']
+
+# Ensure data is a string
+X['comment_embed'] = X['comment_embed'].apply(lambda x: np.str_(x))
+X['comment_tfidf'] = X['comment_tfidf'].apply(lambda x: np.str_(x))
+
+# Create processor for both types of text data
+processor = ColumnTransformer(
+  transformers=[
+    ('embed', embed, 'comment_embed'),
+    ('tf_idf_vec', tf_idf_vec, 'comment_tfidf')])
+
+
+###################### Linear SVC #########################
+
+# Set up pipeline
+comb_svc_pipeline = Pipeline(steps=[
+    ('processor', processor),
+    ('svd', svd),
+    ('linear_svc', linear_svc)])
+
+# Set up grid for hyperparameter optimization 
+comb_svc_param_grid = {
+  'svd': ['passthrough', svd],
+  'processor__tf_idf_vec__min_df': [0.01, 0.05],  
+  'processor__tf_idf_vec__max_df': [0.9, 0.95],  
+  'processor__tf_idf_vec__max_features': [10000, 100000],  
+  'linear_svc__C': [10, 1]
+}
+
+
+comb_svc_search = GridSearchCV(comb_svc_pipeline,
+                                 comb_svc_param_grid,
+                                 n_jobs =-1,
+                                 scoring = 'accuracy',
+                                 cv = custom_cv)
+
+comb_svc_search.fit(X_train, y_train)
+
+# Record best model results 
+comb_svc_predict = comb_svc_search.predict(X_test)
+accuracy_log['comb_svc'] = accuracy_score(y_test, comb_svc_predict)
+
+model_log['comb_svc'] = str(comb_svc_search.best_estimator_)
+
+
+# SGD classifier
+# Choose good HPs for everything
+# Proof read
+# Autogenerate results 
 
 
 
 
-from sklearn import set_config
 
-set_config(display='diagram')
-ovr_logreg_pipeline
 
-# https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html
+
+
+
+
+
+
+
+
+
+

@@ -106,7 +106,7 @@ zero_r.fit(X_train, y_train)
 
 # Record best model results 
 zero_r_predict = zero_r.predict(X_test)
-accuracy_log['zero_r_tfidf'] = accuracy_score(y_test, zero_r_predict)
+accuracy_log['zero_r'] = accuracy_score(y_test, zero_r_predict)
 
 ###################### Linear SVC #########################
 
@@ -144,9 +144,15 @@ model_log['tf_idf_svc'] = str(tf_idf_svc_search.best_estimator_)
 
 ################################################################################
 ################################################################################
-# FAST TEXT
+# EMBEDDING
 ################################################################################
 ################################################################################
+
+# https://github.com/RaRe-Technologies/gensim-data
+# import gensim.downloader
+# print(list(gensim.downloader.info()['models'].keys()))
+# glove_vectors = gensim.downloader.load('glove-twitter-200')
+# gensim.downloader.load('word2vec-google-news-300')
 
 data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
 
@@ -185,53 +191,125 @@ data.replace('authright','right', inplace=True)
 X = data['comment']
 y = data['user.flair']
 
-# Ens data uis a string
+# Ensure data is a string
 X = X.apply(lambda x: np.str_(x))
-X = X.apply(lambda x: x.lower())
+
+# Create embeddings transformer
+embed = EmbeddingTransformer('word2vec-google-news-300')
+
+# Transform raw text to average w2v
+X = embed.transform(X)
 
 # Split data into training and testing sets 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
 
-# https://zeugma.readthedocs.io/en/stable/readme.html#training-embeddings
-# from zeugma.embeddings import EmbeddingTransformer
-glove = EmbeddingTransformer('glove')
-
-X_train = glove.transform(X_train)
-X_test = glove.transform(X_test)
-
-###################### ZeroR #########################
-# Fit the model
-zero_r.fit(X_train, y_train)
-
-# Record best model results 
-zero_r_predict = zero_r.predict(X_test)
-accuracy_log['zero_r_glove'] = accuracy_score(y_test, zero_r_predict)
-
-###################### Linear SVC #########################
-
 # Set up pipeline
-glove_svc_pipeline = Pipeline(steps = [
+embed_svc_pipeline = Pipeline(steps = [
   ('linear_svc', linear_svc)
 ])
 
 # Set up grid for hyperparameter optimization 
-glove_svc_param_grid = {
-  'linear_svc__C': [10, 1]
+embed_svc_param_grid = {
+  'linear_svc__C': [10, 1, 100]
 }
 
 
-glove_svc_search = GridSearchCV(glove_svc_pipeline,
-                                 glove_svc_param_grid,
+embed_svc_search = GridSearchCV(embed_svc_pipeline,
+                                 embed_svc_param_grid,
                                  n_jobs =-1,
                                  scoring = 'accuracy',
                                  cv = custom_cv)
 
-glove_svc_search.fit(X_train, y_train)
+embed_svc_search.fit(X_train, y_train)
 
 # Record best model results 
-glove_svc_predict = glove_svc_search.predict(X_test)
-accuracy_log['glove_svc'] = accuracy_score(y_test, glove_svc_predict)
+embed_svc_predict = embed_svc_search.predict(X_test)
+accuracy_log['embed_svc'] = accuracy_score(y_test, embed_svc_predict)
 
-model_log['glove_svc'] = str(glove_svc_search.best_estimator_)
+model_log['embed_svc'] = str(embed_svc_search.best_estimator_)
+
+################################################################################
+################################################################################
+# TF-IDF + EMBEDDING
+################################################################################
+################################################################################
+
+comb_data = pd.merge(clean_data, data, on='user')
+comb_data.drop(['user.flair_y', 'Unnamed: 0_x', 'Unnamed: 0_y'],axis=1, inplace = True)
+comb_data.rename(columns={'user.flair_x': 'user.flair',
+                          'comment_y': 'comment_embed',
+                          'comment_x': 'comment_tfidf'}, inplace = True)
+
+
+# comb_data = comb_data[comb_data['user.flair'] != ':CENTG: - Centrist']
+# comb_data = comb_data[comb_data['user.flair'] != ':centrist: - Centrist']
+# comb_data = comb_data[comb_data['user.flair'] != ':centrist: - Grand Inquisitor']
+# comb_data = comb_data[comb_data['user.flair'] != ':auth: - AuthCenter']
+# comb_data = comb_data[comb_data['user.flair'] != ':lib: - LibCenter']
+
+# Recode flair labels to avoid doubling up on flairs 
+comb_data.replace(':CENTG: - Centrist','centrist', inplace=True)
+comb_data.replace(':centrist: - Centrist','centrist', inplace=True)
+comb_data.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
+comb_data.replace(':left: - Left', 'left', inplace=True)
+comb_data.replace(':libright: - LibRight', 'libright', inplace=True)
+comb_data.replace(':libright2: - LibRight', 'libright', inplace=True)
+comb_data.replace(':right: - Right',  'right', inplace=True)
+comb_data.replace(':libleft: - LibLeft', 'libleft', inplace=True)
+comb_data.replace(':lib: - LibCenter', 'libcenter', inplace=True)
+comb_data.replace(':auth: - AuthCenter','authcenter', inplace=True)
+comb_data.replace(':authleft: - AuthLeft','authleft', inplace=True)
+comb_data.replace(':authright: - AuthRight','authright', inplace=True)
+
+# Recode to economic flair only
+comb_data.replace('centrist', 'center', inplace=True)
+comb_data.replace('left', 'left', inplace=True)
+comb_data.replace('libright', 'right', inplace=True)
+comb_data.replace('right','right', inplace=True)
+comb_data.replace('libleft', 'left', inplace=True)
+comb_data.replace('libcenter', 'center', inplace=True)
+comb_data.replace('authcenter', 'center', inplace=True)
+comb_data.replace('authleft', 'left', inplace=True)
+comb_data.replace('authright','right', inplace=True)
+
+# Assign features and response appropriately (for TF-IDF we use the cleaned comments)
+X = comb_data[['comment_embed', 'comment_tfidf']]
+y = data['user.flair']
+
+# Ensure data is a string
+X['comment_embed'] = X['comment_embed'].apply(lambda x: np.str_(x))
+X['comment_tfidf'] = X['comment_tfidf'].apply(lambda x: np.str_(x))
+
+# Create embeddings transformer
+embed = EmbeddingTransformer('word2vec-google-news-300')
+
+# Transform raw text to average w2v
+X['comment_embed'] = embed.transform(X['comment_embed'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

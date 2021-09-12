@@ -310,9 +310,9 @@ comb_svc_pipeline = Pipeline(steps=[
 # Set up grid for hyperparameter optimization 
 comb_svc_param_grid = {
   'svd': ['passthrough', svd],
-  'processor__tf_idf_vec__min_df': [0.01, 0.05],  
-  'processor__tf_idf_vec__max_df': [0.9, 0.95],  
-  'processor__tf_idf_vec__max_features': [10000, 100000],  
+  'processor__tf_idf_vec__min_df': [0.01],  
+  'processor__tf_idf_vec__max_df': [0.9],  
+  'processor__tf_idf_vec__max_features': [10000],  
   'linear_svc__C': [10, 1]
 }
 
@@ -352,3 +352,19 @@ results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_nlp_result
 # Choose good HPs for everything
 # Proof read
 # Autogenerate results 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

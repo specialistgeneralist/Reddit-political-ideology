@@ -194,24 +194,23 @@ y = data['user.flair']
 # Ensure data is a string
 X = X.apply(lambda x: np.str_(x))
 
-# Create embeddings transformer
-embed = EmbeddingTransformer('word2vec-google-news-300')
-
-# Transform raw text to average w2v
-X = embed.transform(X)
-
 # Split data into training and testing sets 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
 
+# Create embeddings transformer
+embed = EmbeddingTransformer('word2vec-google-news-300')
+
+###################### Linear SVC #########################
 
 # Set up pipeline
 embed_svc_pipeline = Pipeline(steps = [
+  ('embed', embed),
   ('linear_svc', linear_svc)
 ])
 
 # Set up grid for hyperparameter optimization 
 embed_svc_param_grid = {
-  'linear_svc__C': [10, 1, 100]
+  'linear_svc__C': [10, 1]
 }
 
 
@@ -281,17 +280,15 @@ y = data['user.flair']
 X['comment_embed'] = X['comment_embed'].apply(lambda x: np.str_(x))
 X['comment_tfidf'] = X['comment_tfidf'].apply(lambda x: np.str_(x))
 
-# Create embeddings transformer
-embed = EmbeddingTransformer('word2vec-google-news-300')
-
-# Transform raw text to average w2v
-X['comment_embed'] = embed.transform(X['comment_embed'])
 
 
 
 
 
 
+# Choose good HPs for everything
+# Proof read
+# Autogenerate results 
 
 
 

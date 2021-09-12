@@ -13,6 +13,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.dummy import DummyClassifier
+from sklearn.compose import ColumnTransformer
 from zeugma.embeddings import EmbeddingTransformer
 
 ################################################################################
@@ -280,20 +281,66 @@ y = data['user.flair']
 X['comment_embed'] = X['comment_embed'].apply(lambda x: np.str_(x))
 X['comment_tfidf'] = X['comment_tfidf'].apply(lambda x: np.str_(x))
 
+# Create processor for both types of text data
+processor = ColumnTransformer(
+  transformers=[
+    ('embed', embed, 'comment_embed'),
+    ('tf_idf_vec', tf_idf_vec, 'comment_tfidf')])
+
+
+###################### Linear SVC #########################
+
+# Set up pipeline
+comb_svc_pipeline = Pipeline(steps=[
+    ('processor', processor),
+    ('svd', svd),
+    ('linear_svc', linear_svc)])
+
+# Set up grid for hyperparameter optimization 
+comb_svc_param_grid = {
+  'svd': ['passthrough', svd],
+  'processor__tf_idf_vec__min_df': [0.01, 0.05],  
+  'processor__tf_idf_vec__max_df': [0.9, 0.95],  
+  'processor__tf_idf_vec__max_features': [10000, 100000],  
+  'linear_svc__C': [10, 1]
+}
+
+
+comb_svc_search = GridSearchCV(comb_svc_pipeline,
+                                 comb_svc_param_grid,
+                                 n_jobs =-1,
+                                 scoring = 'accuracy',
+                                 cv = custom_cv)
+
+comb_svc_search.fit(X_train, y_train)
+
+# Record best model results 
+comb_svc_predict = comb_svc_search.predict(X_test)
+accuracy_log['comb_svc'] = accuracy_score(y_test, comb_svc_predict)
+
+model_log['comb_svc'] = str(comb_svc_search.best_estimator_)
+
+################################################################################
+# Save results into a csv for the write-up
+################################################################################
+
+# Turn result dictionaries into a dataframe
+model_df = pd.DataFrame(model_log, index = ['model'])
+acc_df = pd.DataFrame(accuracy_log, index=['accuracy'])
+
+# Join these rowwise
+results = pd.concat([acc_df, model_df])
+results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
+
+# Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
+results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_nlp_results.csv')
 
 
 
-
-
-
+# SGD classifier
 # Choose good HPs for everything
 # Proof read
 # Autogenerate results 
-
-
-
-
-
 
 
 

@@ -1,0 +1,18 @@
+,zero_r,embed_svc,comb_svc,tf_idf_svc
+accuracy,0.766234865803065,0.766234865803065,0.7994242655151977,0.7997629328591991
+model,,"Pipeline(steps=[('embed',
+                 EmbeddingTransformer(model=<gensim.models.keyedvectors.KeyedVectors object at 0x7f85c25d3e50>)),
+                ('linear_svc', LinearSVC(C=10, loss='hinge', random_state=0))])","Pipeline(steps=[('processor',
+                 ColumnTransformer(transformers=[('embed',
+                                                  EmbeddingTransformer(model=<gensim.models.keyedvectors.KeyedVectors object at 0x7f85f0a91640>),
+                                                  'comment_embed'),
+                                                 ('tf_idf_vec',
+                                                  TfidfVectorizer(max_df=0.9,
+                                                                  max_features=10000,
+                                                                  min_df=0.01),
+                                                  'comment_tfidf')])),
+                ('svd', 'passthrough'),
+                ('linear_svc', LinearSVC(C=1, loss='hinge', random_state=0))])","Pipeline(steps=[('tf_idf_vec',
+                 TfidfVectorizer(max_df=0.9, max_features=10000, min_df=0.01)),
+                ('svd', 'passthrough'),
+                ('linear_svc', LinearSVC(C=1, loss='hinge', random_state=0))])"

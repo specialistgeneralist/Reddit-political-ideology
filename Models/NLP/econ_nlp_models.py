@@ -352,19 +352,3 @@ results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_nlp_result
 # Choose good HPs for everything
 # Proof read
 # Autogenerate results 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

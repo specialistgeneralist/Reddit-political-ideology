@@ -14,18 +14,15 @@ from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.dummy import DummyClassifier
 from sklearn.preprocessing import Binarizer
 from sklearn.compose import ColumnTransformer
-from zeugma.embeddings import EmbeddingTransformer
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import MaxAbsScaler
+from sklearn.compose import make_column_selector as selector
 
-################################################################################
-################################################################################
-# TF-IDF models
-################################################################################
-################################################################################
-
+# Load TF-IDF data 
 clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
 clean_data.drop(['Unnamed: 0'], axis=1, inplace=True)
 
+# Load user interaction data 
 int_data = pd.read_parquet('/Volumes/Elements/First_scrape/user-interaction.parquet')
 political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
                   'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
@@ -48,6 +45,7 @@ while True:
       break
 
 
+# Merge datasets 
 data = pd.merge(clean_data, int_data, on='user')
 data.drop(['user.flair_y'],axis=1, inplace = True)
 data.rename(columns={'user.flair_x': 'user.flair'}, inplace = True)
@@ -107,8 +105,11 @@ zero_r = DummyClassifier(strategy = "most_frequent")
 # Set up binarizer
 binarizer = Binarizer()
 
+# Set up scaler 
+scaler = MaxAbsScaler()
+
 # Set up object for truncated SVD 
-svd = TruncatedSVD(random_state = 0, n_components = 200)
+svd = TruncatedSVD(random_state = 0, n_components = 500)
 
 # Set up TF-IDF object to create vocab, count and transform data to TF-IDF features
 tf_idf_vec = TfidfVectorizer(smooth_idf = True, use_idf = True)
@@ -120,22 +121,10 @@ custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state =
 # Create general preprocessing pipeline
 ################################################################################
 
-# Create pipeline of preprocessing steps from user-interaction data
-int_features = data.columns[3:]
-int_transformer = Pipeline(steps = [
-  ('binarizer', binarizer)
-])
-
-# Create pipeline for feature extraction from comments
-text_transformer = Pipeline(steps = [
-  ('tf_idf_vec', tf_idf_vec )
-])
-
-# Create preprocessor 
 processor = ColumnTransformer(
   transformers=[
-    ('int', int_transformer, int_features),
-    ('text', text_transformer, 'comment')])
+    ('int', binarizer, selector(dtype_exclude="category")),
+    ('text', tf_idf_vec, selector(dtype_include="category"))])
 
 ################################################################################
 # ZeroR -- baseline
@@ -149,33 +138,31 @@ zero_r_predict = zero_r.predict(X_test)
 accuracy_log['zero_r'] = accuracy_score(y_test, zero_r_predict)
 
 ################################################################################
-# OVR Logistic regression - no penalty
+# OVR Logistic regression 
 ################################################################################
 
 # Set up OVR logistic regression object
 ovr_logreg = LogisticRegression(solver = 'saga',
                                 max_iter = 1000,
-                                class_weight = 'balanced',
-                                penalty = 'none',
+                                penalty = 'l1',
                                 multi_class = 'ovr',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 
 # OVR logistic regresssion pipeline
 ovr_logreg_pipeline = Pipeline(steps=[('processor', processor),
+                               ('scaler', scaler)       
                                ('svd', svd),
                                ('ovr_logreg', ovr_logreg)])
 
 
 ovr_logreg_param_grid = {
-  'processor__int__binarizer': ['passthrough', binarizer],
   'processor__text__tf_idf_vec__min_df': [0.01],  
   'processor__text__tf_idf_vec__max_df': [0.9],  
-  'processor__text__tf_idf_vec__max_features': [100000],  
-  'svd__n_components': [500],
-  'ovr_logreg__class_weight': ['balanced', None]
+  'processor__text__tf_idf_vec__max_features': [10000, 100000],  
+  'ovr_logreg__C': [0.001, 0.01, 0.1, 1, 10, 100, 'none']
 }
-
 
 
 ovr_logreg_search = GridSearchCV(ovr_logreg_pipeline,
@@ -195,12 +182,70 @@ auc_log['ovr_logreg'] = roc_auc_score(y_test, ovr_logreg_predict_prob, average =
 
 model_log['ovr_logreg'] = str(ovr_logreg_search.best_estimator_)
 
+################################################################################
+# Linear SVC
+################################################################################
+
+# Set up linear SVC object
+svc = LinearSVC(loss = 'hinge',
+                       multi_class = 'ovr',
+                       random_state = 0
+                       )
 
 
 
-from sklearn import set_config
+# OVR logistic regresssion pipeline
+svc_pipeline = Pipeline(steps=[('processor', processor),
+                               ('scaler', scaler)       
+                               ('svd', svd),
+                               ('svc', svc)])
 
-set_config(display='diagram')
-ovr_logreg_pipeline
 
-# https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html
+svc_param_grid = {
+  'svd': ['passthrough', svd],  
+  'processor__text__tf_idf_vec__min_df': [0.01],  
+  'processor__text__tf_idf_vec__max_df': [0.9],  
+  'processor__text__tf_idf_vec__max_features': [10000, 100000],  
+  'svc__C': [0.001, 0.01, 0.1, 1, 10, 100]
+  }
+
+
+svc_search = GridSearchCV(svc_pipeline,
+                                 svc_param_grid,
+                                 n_jobs =-1,
+                                 scoring = 'accuracy',
+                                 cv = custom_cv)
+
+svc_search.fit(X_train, y_train)
+
+# Record best model results 
+svc_predict = svc_search.predict(X_test)
+accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
+
+svc_predict_prob = svc_search.predict_proba(X_test)
+auc_log['svc'] = roc_auc_score(y_test, svc_predict_prob, average = 'weighted', multi_class = 'ovr')
+
+model_log['svc'] = str(svc_search.best_estimator_)
+
+
+################################################################################
+# Save results into a csv for the write-up
+################################################################################
+
+# Turn result dictionaries into a dataframe
+model_df = pd.DataFrame(model_log, index = ['model'])
+acc_df = pd.DataFrame(accuracy_log, index=['accuracy'])
+
+# Join these rowwise
+results = pd.concat([acc_df, model_df])
+results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
+
+# Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
+results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_comb_results.csv')
+
+
+
+
+
+
+

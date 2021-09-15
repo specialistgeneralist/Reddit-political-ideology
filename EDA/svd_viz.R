@@ -38,7 +38,7 @@ colnames(data) <- c('all',1:1000, 'econ', 'social')
 
 p1 <- data %>% 
 ggplot(aes(x=`1`, y=`2`, color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -46,7 +46,7 @@ ggplot(aes(x=`1`, y=`2`, color =econ)) +
 
 p2 <- data %>% 
   ggplot(aes(x=`3`, y=`4`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -54,7 +54,7 @@ p2 <- data %>%
 
 p3 <- data %>% 
   ggplot(aes(x=`5`, y=`6`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -62,7 +62,7 @@ p3 <- data %>%
 
 p4 <- data %>% 
   ggplot(aes(x=`7`, y=`8`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -70,7 +70,7 @@ p4 <- data %>%
 
 p5 <- data %>% 
   ggplot(aes(x=`9`, y=`10`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -78,7 +78,7 @@ p5 <- data %>%
 
 p6 <- data %>% 
   ggplot(aes(x=`11`, y=`12`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -86,7 +86,7 @@ p6 <- data %>%
 
 p7 <- data %>% 
   ggplot(aes(x=`13`, y=`14`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -94,7 +94,7 @@ p7 <- data %>%
 
 p8 <- data %>% 
   ggplot(aes(x=`15`, y=`16`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -102,7 +102,7 @@ p8 <- data %>%
 
 p9 <- data %>% 
   ggplot(aes(x=`17`, y=`18`,   color =econ)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -128,9 +128,9 @@ p3 +
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         legend.position = "None",
-        text = element_text(family = 'serif', face =  'bold', size = 16))
+        text = element_text(family = 'serif', face =  'bold', size = 20))
 
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/esvd_4_5.pdf", 
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/svd_scatterplot.pdf", 
        width = 32, height = 20, units = "cm")
 
 #################################################################################
@@ -139,7 +139,7 @@ ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/esvd_4_5.pdf",
 
 p1 <- data %>% 
   ggplot(aes(x=`1`, y=`2`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -147,7 +147,7 @@ p1 <- data %>%
 
 p2 <- data %>% 
   ggplot(aes(x=`3`, y=`4`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -155,7 +155,7 @@ p2 <- data %>%
 
 p3 <- data %>% 
   ggplot(aes(x=`5`, y=`6`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -163,7 +163,7 @@ p3 <- data %>%
 
 p4 <- data %>% 
   ggplot(aes(x=`7`, y=`8`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -171,7 +171,7 @@ p4 <- data %>%
 
 p5 <- data %>% 
   ggplot(aes(x=`9`, y=`10`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -179,7 +179,7 @@ p5 <- data %>%
 
 p6 <- data %>% 
   ggplot(aes(x=`11`, y=`12`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -187,7 +187,7 @@ p6 <- data %>%
 
 p7 <- data %>% 
   ggplot(aes(x=`13`, y=`14`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -195,7 +195,7 @@ p7 <- data %>%
 
 p8 <- data %>% 
   ggplot(aes(x=`15`, y=`16`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +
@@ -203,7 +203,7 @@ p8 <- data %>%
 
 p9 <- data %>% 
   ggplot(aes(x=`17`, y=`18`,   color =social)) +
-  geom_point(alpha = 0.3, shape = 18) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
   scale_color_manual(values=c("magenta", "grey", "cyan")) + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 16)) +

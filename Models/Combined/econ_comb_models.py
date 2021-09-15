@@ -121,10 +121,22 @@ custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state =
 # Create general preprocessing pipeline
 ################################################################################
 
+# Create pipeline of preprocessing steps from user-interaction data
+int_features = data.columns[3:]
+int_transformer = Pipeline(steps = [
+  ('binarizer', binarizer)
+])
+
+# Create pipeline for feature extraction from comments
+text_transformer = Pipeline(steps = [
+  ('tf_idf_vec', tf_idf_vec )
+])
+
+# Create preprocessor 
 processor = ColumnTransformer(
   transformers=[
-    ('int', binarizer, selector(dtype_exclude="category")),
-    ('text', tf_idf_vec, selector(dtype_include="category"))])
+    ('int', int_transformer, int_features),
+    ('text', text_transformer, 'comment')])
 
 ################################################################################
 # ZeroR -- baseline
@@ -152,7 +164,7 @@ ovr_logreg = LogisticRegression(solver = 'saga',
 
 # OVR logistic regresssion pipeline
 ovr_logreg_pipeline = Pipeline(steps=[('processor', processor),
-                               ('scaler', scaler)       
+                               ('scaler', scaler),       
                                ('svd', svd),
                                ('ovr_logreg', ovr_logreg)])
 
@@ -196,7 +208,7 @@ svc = LinearSVC(loss = 'hinge',
 
 # OVR logistic regresssion pipeline
 svc_pipeline = Pipeline(steps=[('processor', processor),
-                               ('scaler', scaler)       
+                               ('scaler', scaler),       
                                ('svd', svd),
                                ('svc', svc)])
 
@@ -205,7 +217,7 @@ svc_param_grid = {
   'svd': ['passthrough', svd],  
   'processor__text__tf_idf_vec__min_df': [0.01],  
   'processor__text__tf_idf_vec__max_df': [0.9],  
-  'processor__text__tf_idf_vec__max_features': [10000, 100000],  
+  'processor__text__tf_idf_vec__max_features': [10000],  
   'svc__C': [0.001, 0.01, 0.1, 1, 10, 100]
   }
 
@@ -222,8 +234,6 @@ svc_search.fit(X_train, y_train)
 svc_predict = svc_search.predict(X_test)
 accuracy_log['svc'] = accuracy_score(y_test, svc_predict)
 
-svc_predict_prob = svc_search.predict_proba(X_test)
-auc_log['svc'] = roc_auc_score(y_test, svc_predict_prob, average = 'weighted', multi_class = 'ovr')
 
 model_log['svc'] = str(svc_search.best_estimator_)
 
@@ -242,7 +252,6 @@ results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
 results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_comb_results.csv')
-
 
 
 

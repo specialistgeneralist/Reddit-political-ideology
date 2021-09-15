@@ -221,5 +221,3 @@ p9 <- data %>%
 
 ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/social_svd_9.pdf", 
        width = 32, height = 32, units = "cm")
-
-

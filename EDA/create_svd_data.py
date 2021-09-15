@@ -73,6 +73,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
 y_train.reset_index(drop=True, inplace=True)
 y_test.reset_index(drop=True, inplace=True)
 
+# Binarize
+binarizer = Binarizer()
+binarizer.fit(X_train)
+X_train = binarizer.transform(X_train)
+X_test = binarizer.transform(X_test)
+
 # Compute the first 2000 SVD components of predictors (from training set) and transform test and training data accordingly
 svd = TruncatedSVD(n_components = 1000, random_state = 0)
 svd.fit(X_train)

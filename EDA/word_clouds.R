@@ -207,12 +207,66 @@ WC_cent <- WordCloud(econ, 'center')
 WC_right <- WordCloud(econ, 'right')
 
 
+################################################################################
+# PREDICTION
+################################################################################
 
 
+library(tidyverse)
+library(wordcloud)
+
+raw_data <- read_csv('/Volumes/Elements/Text/tf_idf_matrix.csv')
+
+data <- raw_data %>% 
+  mutate(
+    econ.flair = case_when(
+      user.flair == 'centrist' ~ 0,
+      user.flair == 'left' ~ -1,
+      user.flair == 'libright' ~ 1,
+      user.flair == 'right' ~ 1,
+      user.flair == 'libleft' ~  -1,
+      user.flair == 'libcenter' ~ 0,
+      user.flair == 'authcenter' ~ 0,
+      user.flair == 'authleft' ~ -1,
+      user.flair == 'authright' ~ 1),
+    
+    social.flair = case_when(
+      user.flair == 'centrist' ~ 0,
+      user.flair == 'left' ~ 0,
+      user.flair == 'libright' ~ -1,
+      user.flair == 'right' ~ 0,
+      user.flair == 'libleft' ~ -1,
+      user.flair == 'libcenter' ~ -1,
+      user.flair == 'authcenter' ~ 1,
+      user.flair == 'authleft' ~ 1,
+      user.flair == 'authright' ~ 1)
+  )
 
 
+econ_df <- data %>%
+  select(-c(X1, `user.flair`, `social.flair`)) %>% 
+  relocate(econ.flair) 
 
+word_freq <- as_tibble(cbind(colnames(econ_df)[-1] ,cor(econ_df[-1], econ_df$econ.flair)))
+colnames(word_freq) <- c('word', 'freq')
+word_freq$freq <- as.numeric(word_freq$freq)
+word_freq <- word_freq %>% 
+  mutate(freq_r = freq,
+         freq_l = -1*freq)
 
+wordcloud(words = word_freq$word, 
+          freq = word_freq$freq_r, 
+          min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          colors = brewer.pal(8, "Dark2"))
 
-
+wordcloud(words = word_freq$word, 
+          freq = word_freq$freq_l, 
+          min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          colors = brewer.pal(8, "Dark2"))
 

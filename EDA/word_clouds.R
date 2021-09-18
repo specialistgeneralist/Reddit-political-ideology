@@ -206,14 +206,15 @@ WC_left <- WordCloud(econ, 'left')
 WC_cent <- WordCloud(econ, 'center')
 WC_right <- WordCloud(econ, 'right')
 
-
 ################################################################################
-# PREDICTION
 ################################################################################
-
+# PRED
+################################################################################
+################################################################################
 
 library(tidyverse)
 library(wordcloud)
+library(wordcloud2)
 
 raw_data <- read_csv('/Volumes/Elements/Text/tf_idf_matrix.csv')
 
@@ -242,31 +243,96 @@ data <- raw_data %>%
       user.flair == 'authright' ~ 1)
   )
 
+################################################################################
+# ECON
+################################################################################
 
 econ_df <- data %>%
   select(-c(X1, `user.flair`, `social.flair`)) %>% 
   relocate(econ.flair) 
 
-word_freq <- as_tibble(cbind(colnames(econ_df)[-1] ,cor(econ_df[-1], econ_df$econ.flair)))
-colnames(word_freq) <- c('word', 'freq')
-word_freq$freq <- as.numeric(word_freq$freq)
-word_freq <- word_freq %>% 
+word_freq_econ <- as_tibble(cbind(colnames(econ_df)[-1] ,cor(econ_df[-1], econ_df$econ.flair)))
+colnames(word_freq_econ) <- c('word', 'freq')
+word_freq_econ$freq <- as.numeric(word_freq_econ$freq)
+word_freq_econ <- word_freq_econ %>% 
   mutate(freq_r = freq,
          freq_l = -1*freq)
 
-wordcloud(words = word_freq$word, 
-          freq = word_freq$freq_r, 
+set.seed(0)
+wordcloud(words = word_freq_econ$word, 
+          freq = word_freq_econ$freq_r, 
           min.freq = 1,
           max.words = 200,
           random.order = FALSE,
           rot.per = 0.35,
-          colors = brewer.pal(8, "Dark2"))
+          scale=c(1.25,.45),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
 
-wordcloud(words = word_freq$word, 
-          freq = word_freq$freq_l, 
+set.seed(0)
+wordcloud(words = word_freq_econ$word, 
+          freq = word_freq_econ$freq_l, 
           min.freq = 1,
           max.words = 200,
           random.order = FALSE,
           rot.per = 0.35,
-          colors = brewer.pal(8, "Dark2"))
+          scale=c(1.25,.45),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+
+ggplot(arrange(word_freq_econ, desc(freq))[c(1:20,(6470-20):6470),], aes(x=reorder(factor(word), freq), freq)) +
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  xlab('Term') +
+  ylab('Correlation') +
+  theme_bw() +
+  coord_flip() +
+  ggtitle('Predictors of economic ideology') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+
+################################################################################
+# SOCIAL
+################################################################################
+
+
+social_df <- data %>%
+  select(-c(X1, `user.flair`, `econ.flair`)) %>% 
+  relocate(social.flair) 
+
+word_freq_social <- as_tibble(cbind(colnames(social_df)[-1] ,cor(social_df[-1], social_df$social.flair)))
+colnames(word_freq_social) <- c('word', 'freq')
+word_freq_social$freq <- as.numeric(word_freq_social$freq)
+word_freq_social <- word_freq_social %>% 
+  mutate(freq_a = freq,
+         freq_l = -1*freq)
+
+set.seed(0)
+wordcloud(words = word_freq_social$word, 
+          freq = word_freq_social$freq_a, 
+          min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale=c(1.25,.45),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+
+set.seed(0)
+wordcloud(words = word_freq_social$word, 
+          freq = word_freq_social$freq_l, 
+          min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale=c(1.25,.45),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+
+ggplot(arrange(word_freq_social, desc(freq))[c(1:20,(6470-20):6470),], aes(x=reorder(factor(word), freq), freq)) +
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  xlab('Term') +
+  ylab('Correlation') +
+  theme_bw() +
+  coord_flip() +
+  ggtitle('Predictors of economic ideology') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+
+
 

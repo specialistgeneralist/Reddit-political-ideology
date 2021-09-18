@@ -20,7 +20,7 @@ data = read_csv('/Volumes/Elements/Text/nlp_concat_data.csv') %>%
       user.flair == ':lib: - LibCenter' ~  'libcenter',
       user.flair == ':auth: - AuthCenter' ~  'authcenter',
       user.flair == ':authleft: - AuthLeft' ~  'authleft',
-      user.flair == ':authright: - AuthRight' ~  'authright')
+      user.flair == ':authright: - AuthRight' ~  'authright'),
     
     econ = case_when(
       user.flair == 'centrist' ~ 'center',

@@ -35,7 +35,7 @@ mh_3 <- data %>%
   theme_bw()
 
 (mh_1 + mh_2 + mh_3) + plot_annotation(
-  title = 'Proportion of comments in mental health subreddits by ideology',
+  title = 'Proportion of comments in mental health subreddits',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         axis.text.y = element_text(color = 'black'),
@@ -71,7 +71,7 @@ cons <- data %>%
 
 
 (bitcoin + wsb + cons)  + plot_annotation(
-  title = 'Proportion of comments in subreddits you may associate with conservative views',
+  title = 'Proportion of comments in subreddits traditionally associated with conservative views',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         axis.text.y = element_text(color = 'black'),
@@ -106,7 +106,7 @@ twox <-data %>%
   theme_bw()
 
 (lgbt + ahsr +twox) + plot_annotation(
-  title = 'Proportion of comments in subreddits you may associate with progressive views',
+  title = 'Proportion of comments in subreddits traditionally associated with progressive views',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         axis.text.y = element_text(color = 'black'),

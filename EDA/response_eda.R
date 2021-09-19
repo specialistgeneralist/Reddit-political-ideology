@@ -50,6 +50,7 @@ freq_ideology_barchart  <- ggplot(user_flair, aes(x = reorder_size(flair))) +
   geom_bar(fill = 'cyan',color='black') +
   xlab("Ideology") +
   ylab('Frequency')  +
+  theme_bw() +
   plot_annotation(
     title = 'Frequency of Ideology',
   ) &
@@ -57,5 +58,4 @@ freq_ideology_barchart  <- ggplot(user_flair, aes(x = reorder_size(flair))) +
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/response_freq.pdf", 
        width = 32, height = 20, units = "cm")
-
 

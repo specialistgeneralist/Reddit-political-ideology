@@ -16,8 +16,7 @@ mh_1 <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/depression') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 mh_2 <- data %>% 
   select('user.flair','Anxiety') %>% 
@@ -25,8 +24,7 @@ mh_2 <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/Anxiety') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 mh_3 <- data %>% 
   select('user.flair','OCD') %>% 
@@ -34,13 +32,13 @@ mh_3 <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/OCD') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 (mh_1 + mh_2 + mh_3) + plot_annotation(
   title = 'Proportion of comments in mental health subreddits by ideology',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/mh_eda.pdf", 
        width = 32, height = 20, units = "cm")
@@ -53,8 +51,7 @@ bitcoin <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/Bitcoin') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 wsb <- data %>% 
   select('user.flair','wallstreetbets') %>% 
@@ -62,8 +59,7 @@ wsb <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/wallstreetbets') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 cons <- data %>% 
   select('user.flair','conspiracy') %>% 
@@ -71,14 +67,14 @@ cons <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/conspiracy') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 
 (bitcoin + wsb + cons)  + plot_annotation(
   title = 'Proportion of comments in subreddits you may associate with conservative views',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/rightwing_eda.pdf", 
        width = 32, height = 20, units = "cm")
@@ -91,8 +87,7 @@ lgbt <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/lgbt') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 ahsr <- data %>% 
   select('user.flair','AgainstHateSubreddits') %>% 
@@ -100,8 +95,7 @@ ahsr <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/AgainstHateSubreddits') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 twox <-data %>% 
   select('user.flair','TwoXChromosomes') %>% 
@@ -109,13 +103,13 @@ twox <-data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/TwoXChromosomes') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 (lgbt + ahsr +twox) + plot_annotation(
   title = 'Proportion of comments in subreddits you may associate with progressive views',
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/leftwing_eda.pdf", 
        width = 32, height = 20, units = "cm")
@@ -128,8 +122,7 @@ movies <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/movies') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 gaming <- data %>% 
   select('user.flair','gaming') %>% 
@@ -137,8 +130,7 @@ gaming <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/gaming') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 sports <- data %>% 
   select('user.flair','sports') %>% 
@@ -146,14 +138,14 @@ sports <- data %>%
   geom_col(color = 'black', fill = 'cyan') +
   ylab('r/sports') +
   xlab('') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  theme_bw()
 
 (movies + gaming + sports) + 
   plot_annotation(
     title = 'Proportion of comments in hobby related subreddits',
   ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/interests_eda.pdf", 
        width = 32, height = 20, units = "cm")

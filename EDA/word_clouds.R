@@ -71,140 +71,104 @@ left_df <- CreateWFDF(econ, 'left') %>% filter_all(all_vars(!grepl("’", .)))
 econ_center_df <- CreateWFDF(econ, 'center') %>% filter_all(all_vars(!grepl("’", .)))
 right_df <- CreateWFDF(econ, 'right') %>% filter_all(all_vars(!grepl("’", .)))
 
-set.seed(0)
-wordcloud(words = left_df$word, freq = left_df$freq, min.freq = 1,
-          max.words = 200,
-          random.order = FALSE,
-          rot.per = 0.35,
-          colors = brewer.pal(8, "Dark2"))
+auth_df <- CreateWFDF(social, 'auth') %>% filter_all(all_vars(!grepl("’", .)))
+social_center_df <- CreateWFDF(social, 'center') %>% filter_all(all_vars(!grepl("’", .)))
+lib_df <- CreateWFDF(social, 'lib') %>% filter_all(all_vars(!grepl("’", .)))
 
-set.seed(0)
-wordcloud(words = econ_center_df$word, freq = econ_center_df$freq, min.freq = 1,
-          max.words = 200,
-          random.order = FALSE,
-          rot.per = 0.35,
-          colors = brewer.pal(8, "Dark2")) 
+################################################################################
+# Econ - WF
 
-set.seed(0)
-wordcloud(words = right_df$word, freq = right_df$freq, min.freq = 1,
-          max.words = 200,
-          random.order = FALSE,
-          rot.per = 0.35,
-          colors = brewer.pal(8, "Dark2"))
+# set.seed(0)
+# wordcloud(words = left_df$word, freq = left_df$freq, min.freq = 1,
+#           max.words = 200,
+#           random.order = FALSE,
+#           rot.per = 0.35,
+#           colors = brewer.pal(8, "Dark2"))
+# 
+# set.seed(0)
+# wordcloud(words = econ_center_df$word, freq = econ_center_df$freq, min.freq = 1,
+#           max.words = 200,
+#           random.order = FALSE,
+#           rot.per = 0.35,
+#           colors = brewer.pal(8, "Dark2")) 
+# 
+# set.seed(0)
+# wordcloud(words = right_df$word, freq = right_df$freq, min.freq = 1,
+#           max.words = 200,
+#           random.order = FALSE,
+#           rot.per = 0.35,
+#           colors = brewer.pal(8, "Dark2"))
 
 
-bar_left <- ggplot(left_df[1:20,], aes(x=reorder(factor(word), -freq), freq)) +     
+bar_left <- ggplot(left_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
   geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('Term') +
-  ylab('Frequency') +
+  xlab('') +
+  ylab('') +
   theme_bw() +
-  ggtitle('Economically left wing users') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  coord_flip() +
+  ggtitle('economically left') 
 
-bar_econ_center <- ggplot(econ_center_df[1:20,], aes(x=reorder(factor(word), -freq), freq)) +     
+bar_econ_center <- ggplot(econ_center_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
   geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('Term') +
-  ylab('Frequency') +
+  xlab('') +
+  ylab('') +
   theme_bw() +
-  ggtitle('Economically centrist users') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  coord_flip() +
+  ggtitle('economically centrist') 
 
-bar_right <- ggplot(right_df[1:20,], aes(x=reorder(factor(word), -freq), freq)) +     
+bar_right <- ggplot(right_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
   geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('Term') +
-  ylab('Frequency') +
+  xlab('') +
+  ylab('') +
   theme_bw() +
-  ggtitle('Economically right wing users') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+  coord_flip() +
+  ggtitle('economically right') 
 
 (bar_left + bar_econ_center + bar_right)+ 
   plot_annotation(
-    title = 'Word Frequencies by economic ideology',
+    title = 'Word frequencies by economic ideology',
   ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/econ_word_freq.pdf", 
+       width = 32, height = 20, units = "cm")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-set.seed(0)
-ggplot(
-  left_df,
-  aes(label = word, size = freq, color = freq)
-) +
-  geom_text_wordcloud_area() +
-  scale_size_area(max_size = 24) +
+bar_lib <- ggplot(lib_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  xlab('') +
+  ylab('') +
   theme_bw() +
-  scale_color_gradient(low = 'cyan', high = 'magenta')
+  coord_flip() +
+  ggtitle('socially libertarian') 
 
+bar_social_center <- ggplot(social_center_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  xlab('') +
+  ylab('') +
+  theme_bw() +
+  coord_flip() +
+  ggtitle('socially centrist') 
 
-ggwordcloud(left_df$word, left_df$freq)
+bar_auth <- ggplot(auth_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  xlab('') +
+  ylab('') +
+  theme_bw() +
+  coord_flip() +
+  ggtitle('socially authoritarian') 
 
+(bar_lib + bar_social_center + bar_auth)+ 
+  plot_annotation(
+    title = 'Word frequencies by social ideology',
+  ) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
+        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/social_word_freq.pdf", 
+       width = 32, height = 20, units = "cm")
 
-install.packages('ggwordcloud')
-
-output <- wordcloud(words = df$word, freq = df$freq, min.freq = 1,
-                    max.words = 200,
-                    random.order = FALSE,
-                    rot.per = 0.35,
-                    colors = brewer.pal(8, "Dark2"))
-
-
-
-
-WordCloud <- function(problem, ideology){
-  
-  problem <- enquo(problem)
-  
-  docs <- Corpus(VectorSource(filter(data, !!problem == ideology)$comment)) %>% 
-    tm_map(removeNumbers) %>%
-    tm_map(removePunctuation) %>%
-    tm_map(stripWhitespace) %>% 
-    tm_map(content_transformer(tolower)) %>%
-    tm_map(removeWords, stopwords("english"))
-  
-  dtm <- removeSparseTerms(TermDocumentMatrix(docs), sparse = 0.99)
-  matrix <- as.matrix(dtm)
-  words <- sort(rowSums(matrix), decreasing = TRUE)
-  df <- data.frame(word = names(words), freq = words) 
-  
-  set.seed(0)
-  
-  output <- wordcloud(words = df$word, freq = df$freq, min.freq = 1,
-            max.words = 200,
-            random.order = FALSE,
-            rot.per = 0.35,
-            colors = brewer.pal(8, "Dark2"))
-  
-  return(output)
-}
-
-
-WC_left <- WordCloud(econ, 'left')
-WC_cent <- WordCloud(econ, 'center')
-WC_right <- WordCloud(econ, 'right')
 
 ################################################################################
 ################################################################################

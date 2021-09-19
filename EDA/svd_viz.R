@@ -177,7 +177,7 @@ p9 <- data %>%
 
 (p1 + p2 + p3)/(p4 + p5 + p6)/(p7 + p8 + p9) + plot_annotation(
   title = 'Users in SVD space',
-  subtitle = "Authoritarian (magenta), Libertarian (cyan) and centrist (grey)  users from training and validation set in SVD component space"
+  subtitle = "Authoritarian (magenta), libertarian (cyan) and centrist (grey)  users from training and validation set in SVD component space"
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         axis.text.y = element_text(color = 'black'),

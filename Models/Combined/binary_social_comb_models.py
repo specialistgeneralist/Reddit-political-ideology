@@ -262,7 +262,7 @@ model_log['svc'] = str(svc_search.best_estimator_)
 # Turn result dictionaries into a dataframe
 model_df = pd.DataFrame(model_log, index = ['model'])
 acc_df = pd.DataFrame(accuracy_log, index=['accuracy'])
-auc_df = pd.DataFrame(accuracy_log, index=['auc'])
+auc_df = pd.DataFrame(auc_log, index=['auc'])
 
 # Join these rowwise
 results = pd.concat([acc_df, auc_df, model_df])
@@ -270,7 +270,4 @@ results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
 results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/Binary_social_comb_results.csv')
-
-
-
 

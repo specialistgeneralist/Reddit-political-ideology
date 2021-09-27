@@ -141,7 +141,8 @@ ovr_logreg = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'none',
                                 multi_class = 'ovr',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 # Set up Pipeline 
 ovr_logreg_pipeline = Pipeline(steps = [
@@ -184,7 +185,8 @@ ovr_logreg_l1 = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'l1',
                                 multi_class = 'ovr',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 # Set up Pipeline 
 ovr_logreg_l1_pipeline = Pipeline(steps = [
@@ -216,94 +218,6 @@ ovr_logreg_l1_predict_prob = ovr_logreg_l1_search.predict_proba(X_test)
 auc_log['ovr_logreg_l1'] = roc_auc_score(y_test, ovr_logreg_l1_predict_prob[:,1])
 
 model_log['ovr_logreg_l1'] = str(ovr_logreg_l1_search.best_estimator_)
-
-################################################################################
-# Multinomial Logistic regression - no penalty
-################################################################################
-
-# Set up multinomial logistic regression object
-multinomial = LogisticRegression(solver = 'saga',
-                                max_iter = 1000,
-                                class_weight = 'balanced',
-                                penalty = 'none',
-                                multi_class = 'multinomial',
-                                n_jobs = -1)
-
-# Set up Pipeline 
-multinomial_pipeline = Pipeline(steps = [
-  ('binarizer', binarizer), 
-  ('svd', svd),
-  ('multinomial', multinomial)
-])
-
-# Set up grid for hyperparameter optimization 
-multinomial_param_grid = {
-    'binarizer': ['passthrough', binarizer],
-    'multinomial__class_weight': ['balanced', None]
-    }
-
-multinomial_search = GridSearchCV(multinomial_pipeline,
-                      multinomial_param_grid,
-                      n_jobs =-1,
-                      scoring = 'accuracy',
-                      cv = custom_cv)
-
-multinomial_search.fit(X_train, y_train)
-
-
-# Record the best model results 
-multinomial_predict = multinomial_search.predict(X_test)
-accuracy_log['multinomial'] = accuracy_score(y_test, multinomial_predict)
-
-
-multinomial_predict_prob = multinomial_search.predict_proba(X_test)
-auc_log['multinomial'] = roc_auc_score(y_test, multinomial_predict_prob[:,1])
-
-model_log['multinomial'] = str(multinomial_search.best_estimator_)
-
-
-################################################################################
-# Multinomial Logistic regression - Lasso penalty
-################################################################################
-
-# Set up multinomial logistic regression object
-multinomial_l1 = LogisticRegression(solver = 'saga',
-                                max_iter = 1000,
-                                class_weight = 'balanced',
-                                penalty = 'l1',
-                                multi_class = 'multinomial',
-                                n_jobs = -1)
-
-# Set up Pipeline
-multinomial_l1_pipeline = Pipeline(steps = [
-  ('binarizer', binarizer),     
-  ('svd', svd),
-  ('multinomial_l1', multinomial_l1)
-])
-
-# Set up grid for hyperparameter optimization
-multinomial_l1_param_grid = {
-  'binarizer': ['passthrough', binarizer],
-  'multinomial_l1__C': [0.001, 0.01, 0.1, 1, 10, 100]
-}
-
-multinomial_l1_search = GridSearchCV(multinomial_l1_pipeline,
-                                    multinomial_l1_param_grid,
-                                    n_jobs =-1,
-                                    scoring = 'accuracy',
-                                    cv = custom_cv)
-
-multinomial_l1_search.fit(X_train, y_train)
-
-# Record best model results
-multinomial_l1_predict = multinomial_l1_search.predict(X_test)
-accuracy_log['multinomial_l1'] = accuracy_score(y_test, multinomial_l1_predict)
-
-multinomial_l1_predict_prob = multinomial_l1_search.predict_proba(X_test)
-auc_log['multinomial_l1'] = roc_auc_score(y_test, multinomial_l1_predict_prob[:,1])
-
-model_log['multinomial_l1'] = str(multinomial_l1_search.best_estimator_)
-
 
 ################################################################################
 # Random Forest
@@ -458,6 +372,5 @@ results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
 results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/Binary_econ_int_results.csv')
-
 
 

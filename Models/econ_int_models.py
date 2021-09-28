@@ -135,7 +135,8 @@ ovr_logreg = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'none',
                                 multi_class = 'ovr',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 # Set up Pipeline 
 ovr_logreg_pipeline = Pipeline(steps = [
@@ -178,7 +179,8 @@ ovr_logreg_l1 = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'l1',
                                 multi_class = 'ovr',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 # Set up Pipeline 
 ovr_logreg_l1_pipeline = Pipeline(steps = [
@@ -221,7 +223,8 @@ multinomial = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'none',
                                 multi_class = 'multinomial',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state = 0)
 
 # Set up Pipeline 
 multinomial_pipeline = Pipeline(steps = [
@@ -266,7 +269,8 @@ multinomial_l1 = LogisticRegression(solver = 'saga',
                                 class_weight = 'balanced',
                                 penalty = 'l1',
                                 multi_class = 'multinomial',
-                                n_jobs = -1)
+                                n_jobs = -1,
+                                random_state =0)
 
 # Set up Pipeline
 multinomial_l1_pipeline = Pipeline(steps = [

@@ -268,56 +268,6 @@ model_log['rf'] = str(rf_search.best_estimator_)
 
 
 ################################################################################
-# OVR Random Forest
-################################################################################
-
-ovr_rf = OneVsRestClassifier(
-    RandomForestClassifier(
-        n_estimators = 500,
-        criterion = 'gini',
-        min_samples_split = 5,
-        min_samples_leaf = 5,
-        max_features = 'sqrt',
-        n_jobs = -1,
-        random_state = 0,
-        class_weight = 'balanced_subsample'
-        )
-    )
-
-
-# Set up Pipeline
-ovr_rf_pipeline = Pipeline(steps =[
-  ('binarizer', binarizer),     
-  ('svd', svd),
-  ('ovr_rf', ovr_rf)
-])
-
-# Set up grid for hyperparameter optimization
-ovr_rf_param_grid = {
-  'binarizer': ['passthrough', binarizer],  
-  'ovr_rf__estimator__min_samples_split': [5, 10, 20],
-  'ovr_rf__estimator__min_samples_leaf': [5, 10, 20],
-  'ovr_rf__estimator__class_weight': ['balanced_subsample', None]  
-}
-
-ovr_rf_search = GridSearchCV(ovr_rf_pipeline,
-                         ovr_rf_param_grid,
-                         n_jobs =-1,
-                         scoring = 'accuracy',
-                         cv = custom_cv)
-
-ovr_rf_search.fit(X_train, y_train)
-
-# Record best model results
-ovr_rf_predict = ovr_rf_search.predict(X_test)
-accuracy_log['ovr_rf'] = accuracy_score(y_test, ovr_rf_predict)
-
-ovr_rf_predict_prob = ovr_rf_search.predict_proba(X_test)
-auc_log['ovr_rf'] = roc_auc_score(y_test, ovr_rf_predict_prob[:,1])
-
-model_log['ovr_rf'] = str(ovr_rf_search.best_estimator_)
-
-################################################################################
 # ADA Boost 
 ################################################################################
 
@@ -372,17 +322,6 @@ results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
 results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/Binary_social_int_results.csv')
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,12 +1,13 @@
-,multinomial_l1,zero_r,rf,ovr_rf,adaboost,multinomial,ovr_logreg_l1,ovr_logreg
-accuracy,0.4814425986537393,0.5284382140431051,0.5393071080096338,0.539801148644476,0.5399864138825419,0.5582041622923486,0.5594392638794541,0.5595010189588093
-auc,0.666754697170348,,0.6258023152421924,0.6371845400180779,0.6321353215469129,0.673479971767404,0.6730825531575282,0.673081418943404
+,multinomial_l1,zero_r,rf,ovr_rf,adaboost,multinomial,ovr_logreg,ovr_logreg_l1
+accuracy,0.4815661088124498,0.5284382140431051,0.5393071080096338,0.539801148644476,0.5399864138825419,0.5582041622923486,0.5594392638794541,0.5594392638794541
+auc,0.6667541083136993,,0.6258023152421924,0.6371845400180779,0.6321353215469129,0.6734792039600362,0.6730815907617093,0.6730831021749545
 model,"Pipeline(steps=[('binarizer', Binarizer()),
                 ('svd', TruncatedSVD(n_components=500, random_state=0)),
                 ('multinomial_l1',
                  LogisticRegression(C=0.1, class_weight='balanced',
                                     max_iter=1000, multi_class='multinomial',
-                                    n_jobs=-1, penalty='l1', solver='saga'))])",,"Pipeline(steps=[('binarizer', 'passthrough'),
+                                    n_jobs=-1, penalty='l1', random_state=0,
+                                    solver='saga'))])",,"Pipeline(steps=[('binarizer', 'passthrough'),
                 ('svd', TruncatedSVD(n_components=500, random_state=0)),
                 ('rf',
                  RandomForestClassifier(class_weight='balanced_subsample',
@@ -29,13 +30,15 @@ model,"Pipeline(steps=[('binarizer', Binarizer()),
                 ('svd', TruncatedSVD(n_components=500, random_state=0)),
                 ('multinomial',
                  LogisticRegression(max_iter=1000, multi_class='multinomial',
-                                    n_jobs=-1, penalty='none',
+                                    n_jobs=-1, penalty='none', random_state=0,
+                                    solver='saga'))])","Pipeline(steps=[('binarizer', Binarizer()),
+                ('svd', TruncatedSVD(n_components=500, random_state=0)),
+                ('ovr_logreg',
+                 LogisticRegression(max_iter=1000, multi_class='ovr', n_jobs=-1,
+                                    penalty='none', random_state=0,
                                     solver='saga'))])","Pipeline(steps=[('binarizer', Binarizer()),
                 ('svd', TruncatedSVD(n_components=500, random_state=0)),
                 ('ovr_logreg_l1',
                  LogisticRegression(C=100, max_iter=1000, multi_class='ovr',
-                                    n_jobs=-1, penalty='l1', solver='saga'))])","Pipeline(steps=[('binarizer', Binarizer()),
-                ('svd', TruncatedSVD(n_components=500, random_state=0)),
-                ('ovr_logreg',
-                 LogisticRegression(max_iter=1000, multi_class='ovr', n_jobs=-1,
-                                    penalty='none', solver='saga'))])"
+                                    n_jobs=-1, penalty='l1', random_state=0,
+                                    solver='saga'))])"

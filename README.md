@@ -1,5 +1,7 @@
 # RedditIdeology-Honours2021
-Files for scraping and modeling reddit users' ideologies 
+Files for scraping and modeling reddit users' ideologies as a function of digital footprints.
+
+Any file in this repo that is not mentioned in the below list is obsolete and was not used in the final project.
 
 ## Data Collection
 
@@ -11,16 +13,49 @@ Files for scraping and modeling reddit users' ideologies
 
 ## Models
 
+**In the main folder**
+
 1. *all_class_int_models.py* this script trains, optimizes and validates models designed to predict the ideology of users based on the user-interaction matrix produced by data_manipulator_complete.py (see the Data Collection folder)and produces a csv file that records the exact specification of each model and its accuracy and AUC on a testing set.
 2. *econ_int_models.py* does the same but with the task of predicting the economic element of the user's ideology from the user-interaction matrix.
 3. *social_int_models.py* does the same but with the task of predicting the social element of the user's ideology from the user-interaction matrix.
+4. *binary_econ_int_models.py* does the same but omits economic centrists; predicts if users are economically left or right from the user-interaction matrix.
+5. *binary_social_int_models.py* same as above but omits social centrists; predicts if users are socially authoritarian or libertarian from the user-interaction matrix.
+
+**In the NLP subfolder**
+
+1. *all_class_nlp_models.py* this script trains, optimizes and validates models designed to predict the ideology of users based on the textual features produced by text_manipulator.py (see the Data Collection folder)and produces a csv file that records the exact specification of each model and its accuracy and AUC on a testing set.
+2. *econ_nlp_models.py* does the same but with the task of predicting the economic element of the user's ideology from textual features.
+3. *social_nlp_models.py* does the same but with the task of predicting the social element of the user's ideology from textual features.
+4. *binary_econ_nlp_models.py* does the same but omits economic centrists; predicts if users are economically left or right from textual features.
+5. *binary_social_nlp_models.py* same as above but omits social centrists; predicts if users are socially authoritarian or libertarian from textual features.
+
+**In the Combined subfolder**
+
+1. *all_class_comb_models.py* this script trains, optimizes and validates models designed to predict the ideology of users based on the user interaction matrix produced by data_manipulator_complete.py and textual features produced by text_manipulator.py (see the Data Collection folder)and produces a csv file that records the exact specification of each model and its accuracy and AUC on a testing set.
+2. *econ_comb_models.py* does the same but with the task of predicting the economic element of the user's ideology from the user interaction matrix and textual features.
+3. *social_comb_models.py* does the same but with the task of predicting the social element of the user's ideology from the user interaction matrix and textual features.
+4. *binary_econ_comb_models.py* does the same but omits economic centrists; predicts if users are economically left or right from the user interaction matrix and textual features.
+5. *binary_social_comb_models.py* same as above but omits social centrists; predicts if users are socially authoritarian or libertarian from the user interaction matrix and textual features.
 
 ## Results
 
 1. *all_int_results.csv* contains a record of each model developed in all_class_int_models.py, its accuracy and auc on training set.
-2. *econ_int_results.csv* contains a record of each model developed in econ_class_int_models.py, its accuracy and auc on training set.
-3. *social_int_results.csv* contains a record of each model developed in social_class_int_models.py, its accuracy and auc on training set.
-4. *svd_k.csv* contains the original variables that contribute most to the first 10 SVD components, it is produced by k_analysis.py.
+2. *econ_int_results.csv* contains a record of each model developed in econ_int_models.py, its accuracy and auc on training set.
+3. *social_int_results.csv* contains a record of each model developed in social_int_models.py, its accuracy and auc on training set.
+4. *binary_social_int_results.csv* contains a record of each model developed in binary_social_int_models.py, its accuracy and auc on training set.
+5. *binary_econ_int_results.csv* contains a record of each model developed in binary_econ_int_models.py, its accuracy and auc on training set.
+6. *all_nlp_results.csv* contains a record of each model developed in all_class_nlp_models.py, its accuracy and auc on training set.
+7. *econ_nlp_results.csv* contains a record of each model developed in econ_nlp_models.py, its accuracy and auc on training set.
+8. *social_nlp_results.csv* contains a record of each model developed in social_nlp_models.py, its accuracy and auc on training set.
+9. *binary_social_nlp_results.csv* contains a record of each model developed in binary_social_nlp_models.py, its accuracy and auc on training set.
+10. *binary_econ_nlp_results.csv* contains a record of each model developed in binary_econ_nlp_models.py, its accuracy and auc on training set.
+11. *all_comb_results.csv* contains a record of each model developed in all_class_comb_models.py, its accuracy and auc on training set.
+12. *econ_comb_results.csv* contains a record of each model developed in econ_comb_models.py, its accuracy and auc on training set.
+13. *social_comb_results.csv* contains a record of each model developed in social_comb_models.py, its accuracy and auc on training set.
+14. *binary_social_comb_results.csv* contains a record of each model developed in binary_social_comb_models.py, its accuracy and auc on training set.
+15. *binary_econ_comb_results.csv* contains a record of each model developed in binary_econ_comb_models.py, its accuracy and auc on training set.
+16. *svd_k.csv* contains the original variables that contribute most to the first 10 SVD components, it is produced by k_analysis.py.
+17. *results_summary.xlsx* overview of results from the other files that can easily be converted to LaTex tables using Excel2Latex
 
 ## EDA
 

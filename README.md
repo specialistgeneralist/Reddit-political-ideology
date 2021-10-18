@@ -63,6 +63,11 @@ Any file in this repo that is not mentioned in the below list is obsolete and wa
 2. *interactions_eda.R* this script uses the data file produced by create_eda_data.py to create visual analyses of the relationshup between ideology and subreddit interaction.
 3. *k_analysis.py* this script uses the user-interaction matrix to 1) produce a graphic of the accuracy of predictions using a varying number of SVD components and 2) produce svd_k.csv.
 4. *result_int_viz.R* this script takes the all_int_results.csv, econ_int_results.csv, and social_int_results.csv files and produces graphics illustrating the predictive performance of all the models developed in all_class_int_models.py, econ_class_int_models.py and social_class_int_models.py.
+5. *create_svd_data.py* this script just computes the SVD components of the training set for user-interaction matrix models and exports them to csv so that I can create plots in R showing the data in SVD space
+6. *create_tf_idf_viz_data.py* this script computes the tf-idf scores for different words used by users in their comments and exports this dataframe to a csv so I can create plots showing the frequency of different words in R
+7. *response_eda.py* this script creates a plot of the proportion of each ideological class in our data set
+8. *svd_viz.R* this script creates plots of the data in SVD component space
+9. *word_clouds.R* this script creates plots of word frequncy and various word clouds
 
 ## Write up
 

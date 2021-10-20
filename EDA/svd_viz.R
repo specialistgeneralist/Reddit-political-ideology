@@ -1,89 +1,186 @@
-################################################################################
-# Preparing data
-################################################################################
+library(tidyverse)
+library(patchwork)
 
-# Load the necessary packages
-import pandas as pd
-import scipy.sparse
-from sklearn.decomposition import TruncatedSVD
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score, roc_auc_score
-from sklearn.preprocessing import Binarizer
-import matplotlib.pyplot as plt
+data <- read_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_data.csv') %>% 
+  select(-X1) %>%
+  mutate(
+    econ = case_when(
+      user.flair == 'centrist' ~ 'center',
+      user.flair == 'left' ~ 'left',
+      user.flair == 'libright' ~ 'right',
+      user.flair == 'right' ~ 'right',
+      user.flair == 'libleft' ~ 'left',
+      user.flair == 'libcenter' ~ 'center',
+      user.flair == 'authcenter' ~ 'center',
+      user.flair == 'authleft' ~ 'left',
+      user.flair == 'authright' ~ 'right',      
+    ),
+    
+    social = case_when(
+      user.flair == 'centrist' ~ 'center',
+      user.flair == 'left' ~ 'center',
+      user.flair == 'libright' ~ 'lib',
+      user.flair == 'right' ~ 'center',
+      user.flair == 'libleft' ~ 'lib',
+      user.flair == 'libcenter' ~ 'lib',
+      user.flair == 'authcenter' ~ 'auth',
+      user.flair == 'authleft' ~ 'auth',
+      user.flair == 'authright' ~ 'auth',
+    )
+  ) %>%
+  rename(all = `user.flair`)
 
-# Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+colnames(data) <- c('all',1:500, 'econ', 'social')
 
-# Remove explicitly political columns
-political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
-                  'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
-                  'republicans', 'conservatives']
-data.drop(columns = political_subs, inplace = True)
+#################################################################################
+# ECON
+#################################################################################
+
+p1 <- data %>% 
+  ggplot(aes(x=`1`, y=`2`, color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p2 <- data %>% 
+  ggplot(aes(x=`3`, y=`4`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p3 <- data %>% 
+  ggplot(aes(x=`5`, y=`6`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p4 <- data %>% 
+  ggplot(aes(x=`7`, y=`8`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p5 <- data %>% 
+  ggplot(aes(x=`9`, y=`10`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p6 <- data %>% 
+  ggplot(aes(x=`11`, y=`12`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p7 <- data %>% 
+  ggplot(aes(x=`13`, y=`14`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p8 <- data %>% 
+  ggplot(aes(x=`15`, y=`16`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+p9 <- data %>% 
+  ggplot(aes(x=`17`, y=`18`,   color =econ)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("gray",  'magenta', "cyan")) + 
+  theme_bw()
+
+(p1 + p2 + p3)/(p4 + p5 + p6)/(p7 + p8 + p9) + plot_annotation(
+  title = 'Users in SVD space'
+) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
+        legend.position = "None",
+        text = element_text(size = 16, color = 'black'))
+
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/econ_svd_9.pdf", 
+       width = 32, height = 32, units = "cm")
+
+p3 + 
+  xlab('SVD component 5') +
+  ylab('SVD component 6') +
+  plot_annotation(
+    title = 'Users in SVD space; economic ideology'
+  ) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
+        legend.position = "None",
+        text = element_text(size = 20, color = 'black'))
+
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/svd_scatterplot.pdf", 
+       width = 32, height = 20, units = "cm")
+
+#################################################################################
+# SOCIAL
+#################################################################################
+
+p1 <- data %>% 
+  ggplot(aes(x=`1`, y=`2`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p2 <- data %>% 
+  ggplot(aes(x=`3`, y=`4`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p3 <- data %>% 
+  ggplot(aes(x=`5`, y=`6`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p4 <- data %>% 
+  ggplot(aes(x=`7`, y=`8`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p5 <- data %>% 
+  ggplot(aes(x=`9`, y=`10`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p6 <- data %>% 
+  ggplot(aes(x=`11`, y=`12`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p7 <- data %>% 
+  ggplot(aes(x=`13`, y=`14`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p8 <- data %>% 
+  ggplot(aes(x=`15`, y=`16`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+p9 <- data %>% 
+  ggplot(aes(x=`17`, y=`18`,   color =social)) +
+  geom_point(alpha = 0.2, shape = 18, size = 5) +
+  scale_color_manual(values=c("magenta", "grey", "cyan")) + 
+  theme_bw()
+
+(p1 + p2 + p3)/(p4 + p5 + p6)/(p7 + p8 + p9) + plot_annotation(
+  title = 'Users in SVD space; social ideology',
+) &
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
+        axis.text.y = element_text(color = 'black'),
+        legend.position = "None",
+        text = element_text(size = 16, color = 'black'))
 
 
-# Remove columns with insufficient interaction 
-# This loop will remove subreddits with less than 50 comments and users with less than 50 comments until no row
-# or column violates this condition
-while True:
-  print('in: '+str(data.shape))
-  size = data.size 
-  col_sum = data.sum(axis = 0, numeric_only = True)
-  row_sum = data.sum(axis = 1, numeric_only = True)
-  bad_cols = col_sum[col_sum <= 50].index
-  bad_rows = row_sum[row_sum <= 50].index
-  data.drop(index = bad_rows, columns = bad_cols, inplace = True)
-  print('out: ' + str(data.shape))
-  if data.size == size:
-      break
-
-# Seperate data into target/features and make features sparse
-features = list(data.columns)
-features.remove('user.flair')
-y = data['user.flair'].copy(deep=True)
-X = scipy.sparse.csr_matrix(data[features].values)
-
-# Delete data to free up memory
-del data
-
-# Recode flair labels to avoid 
-y.replace(':CENTG: - Centrist','centrist', inplace=True)
-y.replace(':centrist: - Centrist','centrist', inplace=True)
-y.replace(':centrist: - Grand Inquisitor','centrist', inplace=True)
-y.replace(':left: - Left', 'left', inplace=True)
-y.replace(':libright: - LibRight', 'libright', inplace=True)
-y.replace(':libright2: - LibRight', 'libright', inplace=True)
-y.replace(':right: - Right',  'right', inplace=True)
-y.replace(':libleft: - LibLeft', 'libleft', inplace=True)
-y.replace(':lib: - LibCenter', 'libcenter', inplace=True)
-y.replace(':auth: - AuthCenter','authcenter', inplace=True)
-y.replace(':authleft: - AuthLeft','authleft', inplace=True)
-y.replace(':authright: - AuthRight','authright', inplace=True)
-
-
-y.reset_index(drop = True, inplace=True)
-
-
-# Split data into train andtest sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size = 0.2, 
-                                                    stratify = y,
-                                                    random_state = 0)
-y_train.reset_index(drop=True, inplace=True)
-y_test.reset_index(drop=True, inplace=True)
-
-# Binarize
-binarizer = Binarizer()
-binarizer.fit(X_train)
-X = binarizer.transform(X)
-
-# Compute the first 500 SVD components 
-svd = TruncatedSVD(n_components = 500, random_state = 0)
-svd.fit(X_train)
-X = svd.transform(X)
-
-data = pd.concat([y, pd.DataFrame(X)], axis=1)
-data.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_data.csv')
-
-
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/social_svd_9.pdf", 
+       width = 32, height = 32, units = "cm")

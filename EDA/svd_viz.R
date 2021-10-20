@@ -91,7 +91,7 @@ p9 <- data %>%
   theme_bw()
 
 (p1 + p2 + p3)/(p4 + p5 + p6)/(p7 + p8 + p9) + plot_annotation(
-  title = 'Users in SVD space'
+  title = 'Users in SVD space; economic ideology'
 ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         axis.text.y = element_text(color = 'black'),

@@ -4,7 +4,15 @@ library(tm)
 library(wordcloud)
 library(patchwork)
 library(ggwordcloud)
+library(wordcloud)
 library(tidytext)
+library(gridExtra)
+library(gridGraphics)
+library(ggplotify)
+
+################################################################################
+# FREQUENCIES
+################################################################################
 
 data = read_csv('/Volumes/Elements/Text/nlp_concat_data.csv') %>% 
   select(-X1) %>% 
@@ -105,42 +113,9 @@ ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/word_freq.pdf",
        width = 32, height = 20, units = "cm")
   
 
-
 ################################################################################
-# Econ - WF
-
-# set.seed(0)
-# wordcloud(words = left_df$word, freq = left_df$freq, min.freq = 1,
-#           max.words = 200,
-#           random.order = FALSE,
-#           rot.per = 0.35,
-#           colors = brewer.pal(8, "Dark2"))
-# 
-# set.seed(0)
-# wordcloud(words = econ_center_df$word, freq = econ_center_df$freq, min.freq = 1,
-#           max.words = 200,
-#           random.order = FALSE,
-#           rot.per = 0.35,
-#           colors = brewer.pal(8, "Dark2")) 
-# 
-# set.seed(0)
-# wordcloud(words = right_df$word, freq = right_df$freq, min.freq = 1,
-#           max.words = 200,
-#           random.order = FALSE,
-#           rot.per = 0.35,
-#           colors = brewer.pal(8, "Dark2"))
-
-
-
+# WORDCLOUD
 ################################################################################
-################################################################################
-# PRED
-################################################################################
-################################################################################
-
-library(tidyverse)
-library(wordcloud)
-library(wordcloud2)
 
 raw_data <- read_csv('/Volumes/Elements/Text/tf_idf_matrix.csv')
 
@@ -169,10 +144,6 @@ data <- raw_data %>%
       user.flair == 'authright' ~ 1)
   )
 
-################################################################################
-# ECON
-################################################################################
-
 econ_df <- data %>%
   select(-c(X1, `user.flair`, `social.flair`)) %>% 
   relocate(econ.flair) 
@@ -183,56 +154,6 @@ word_freq_econ$freq <- as.numeric(word_freq_econ$freq)
 word_freq_econ <- word_freq_econ %>% 
   mutate(freq_r = freq,
          freq_l = -1*freq)
-
-
-col_econ <- ggplot(arrange(word_freq_econ, desc(freq))[c(1:20,(6470-20):6470),], aes(x=reorder(factor(word), freq), freq)) +
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('Term') +
-  ylab('Correlation') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('predictors of economic ideology') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        axis.text.y = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
-
-
-wc_econ_right <- arrange(word_freq_econ, desc(freq_r))[1:200,] %>% 
-  ggplot(aes(label = word, size = freq_r^0.5, color = freq_r)) +
-  geom_text_wordcloud_area(rm_outside = TRUE,
-                           max_steps = 1,
-                           grid_size = 1, 
-                           eccentricity = .9,
-                           seed = 0) +
-  theme_minimal() +
-  scale_color_gradient(low = "cyan", high = "magenta") + 
-  ggtitle('right wing')
-
-wc_econ_left <- arrange(word_freq_econ, desc(freq_l))[1:200,] %>% 
-  ggplot(aes(label = word, size = freq_l^0.5, color = freq_l)) +
-  geom_text_wordcloud_area(rm_outside = TRUE,
-                           max_steps = 1,
-                           grid_size = 1, 
-                           eccentricity = .9,
-                           seed = 0) +
-  theme_minimal() +
-  scale_color_gradient(low = "cyan", high = "magenta") + 
-  ggtitle('left wing')
-
-((wc_econ_right / wc_econ_left + plot_layout(guides = 'auto')) | col_econ) + 
-  plot_annotation(
-    title = 'Textual predictors of economic ideology',
-  ) &
-  theme(axis.text.x = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/tf_idf_econ.pdf", 
-       width = 32, height = 32, units = "cm")
-
-
-################################################################################
-# SOCIAL
-################################################################################
-
 
 social_df <- data %>%
   select(-c(X1, `user.flair`, `econ.flair`)) %>% 
@@ -245,46 +166,60 @@ word_freq_social <- word_freq_social %>%
   mutate(freq_a = freq,
          freq_l = -1*freq)
 
-col_social <- ggplot(arrange(word_freq_social, desc(freq))[c(1:20,(6470-20):6470),], aes(x=reorder(factor(word), freq), freq)) +
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('Term') +
-  ylab('Correlation') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('predictors of social ideology') +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        axis.text.y = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+
+# Econ right
+set.seed(0)
+plot1 <- wordcloud(words = word_freq_econ$word, freq = word_freq_econ$freq_r, min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale = c(3, 3*(1/30)),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+grid.echo()
+p1 <- as.ggplot(grid.grab()) + ggtitle("economic - right")  + theme(plot.title = element_text(hjust = 0.5, size = 20))
+
+# Econ left
+set.seed(0)
+plot2 <- wordcloud(words = word_freq_econ$word, freq = word_freq_econ$freq_l, min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale = c(2, 2*(1/30)),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+grid.echo()
+p2 <- as.ggplot(grid.grab()) + ggtitle("economic - left")  + theme(plot.title = element_text(hjust = 0.5, size = 20))
 
 
-wc_social_auth <- arrange(word_freq_social, desc(freq_a))[1:200,] %>% 
-  ggplot(aes(label = word, size = freq_a^0.5, color = freq_a)) +
-  geom_text_wordcloud_area(rm_outside = TRUE,
-                           max_steps = 1,
-                           grid_size = 1, 
-                           eccentricity = .9,
-                           seed = 0) +
-  theme_minimal() +
-  scale_color_gradient(low = "cyan", high = "magenta") + 
-  ggtitle('authoritarian')
 
-wc_social_lib <- arrange(word_freq_social, desc(freq_l))[1:200,] %>% 
-  ggplot(aes(label = word, size = freq_l^0.5, color = freq_l)) +
-  geom_text_wordcloud_area(rm_outside = TRUE,
-                           max_steps = 1,
-                           grid_size = 1, 
-                           eccentricity = .9,
-                           seed = 0) +
-  theme_minimal() +
-  scale_color_gradient(low = "cyan", high = "magenta") + 
-  ggtitle('libertarian')
+# Social auth
+set.seed(0)
+plot3 <- wordcloud(words = word_freq_social$word, freq = word_freq_social$freq_a, min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale = c(2, 2*(1/30)),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+grid.echo()
+p3 <- as.ggplot(grid.grab()) + ggtitle("social - auth")  + theme(plot.title = element_text(hjust = 0.5, size = 20))
 
-((wc_social_auth / wc_social_lib + plot_layout(guides = 'auto')) | col_social) + 
+
+# Social lib
+set.seed(0)
+plot4 <- wordcloud(words = word_freq_social$word, freq = word_freq_social$freq_l, min.freq = 1,
+          max.words = 200,
+          random.order = FALSE,
+          rot.per = 0.35,
+          scale = c(2, 2*(1/30)),
+          colors = colorRampPalette(c("cyan", "magenta"))(8))
+grid.echo()
+p4 <- as.ggplot(grid.grab()) + ggtitle("social - lib") + theme(plot.title = element_text(hjust = 0.5, size = 20))
+
+
+(p1 + p2)/(p3+p4) + 
   plot_annotation(
-    title = 'Textual predictors of social ideology',
+    title = 'Textual predictors of ideology',
   ) &
-  theme(axis.text.x = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/tf_idf_social.pdf", 
-       width = 32, height = 32, units = "cm")
-
+  theme(
+        text = element_text(size = 20, color = 'black'))
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/wordclouds.pdf", 
+       width = 40, height = 40, units = "cm")

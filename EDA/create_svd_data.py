@@ -76,15 +76,12 @@ y_test.reset_index(drop=True, inplace=True)
 # Binarize
 binarizer = Binarizer()
 binarizer.fit(X_train)
-X_train = binarizer.transform(X_train)
-X_test = binarizer.transform(X_test)
+X = binarizer.transform(X)
 
-# Compute the first 2000 SVD components of predictors (from training set) and transform test and training data accordingly
-svd = TruncatedSVD(n_components = 1000, random_state = 0)
+# Compute the first 500 SVD components 
+svd = TruncatedSVD(n_components = 500, random_state = 0)
 svd.fit(X_train)
-X_train = svd.transform(X_train)
-X_test = svd.transform(X_test)
+X = svd.transform(X)
 
-
-data = pd.concat([y_test, pd.DataFrame(X_test)], axis=1)
+data = pd.concat([y, pd.DataFrame(X)], axis=1)
 data.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_data.csv')

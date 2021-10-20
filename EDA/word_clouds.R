@@ -4,6 +4,7 @@ library(tm)
 library(wordcloud)
 library(patchwork)
 library(ggwordcloud)
+library(tidytext)
 
 data = read_csv('/Volumes/Elements/Text/nlp_concat_data.csv') %>% 
   select(-X1) %>% 
@@ -67,13 +68,43 @@ CreateWFDF <- function(problem, ideology){
   return(df)
 }
 
-left_df <- CreateWFDF(econ, 'left') %>% filter_all(all_vars(!grepl("’", .)))
-econ_center_df <- CreateWFDF(econ, 'center') %>% filter_all(all_vars(!grepl("’", .)))
-right_df <- CreateWFDF(econ, 'right') %>% filter_all(all_vars(!grepl("’", .)))
+left_df <- CreateWFDF(econ, 'left') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'left')
+econ_center_df <- CreateWFDF(econ, 'center') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'econ center')
+right_df <- CreateWFDF(econ, 'right') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'right')
+auth_df <- CreateWFDF(social, 'auth') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'auth')
+social_center_df <- CreateWFDF(social, 'center') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'social center')
+lib_df <- CreateWFDF(social, 'lib') %>% filter_all(all_vars(!grepl("’", .))) %>% mutate(ideology = 'lib') 
 
-auth_df <- CreateWFDF(social, 'auth') %>% filter_all(all_vars(!grepl("’", .)))
-social_center_df <- CreateWFDF(social, 'center') %>% filter_all(all_vars(!grepl("’", .)))
-lib_df <- CreateWFDF(social, 'lib') %>% filter_all(all_vars(!grepl("’", .)))
+rbind(left_df[1:20,], 
+      econ_center_df[1:20,],
+      right_df[1:20,],
+      auth_df[1:20,],
+      social_center_df[1:20,],
+      lib_df[1:20,]
+      ) %>%
+  mutate(ideology = factor(ideology, levels =
+                             c('left', 'econ center', 'right',
+                               'lib', 'social center', 'auth')),
+         word = factor(word)) %>% 
+  group_by(ideology) %>% 
+  ggplot(aes(x=reorder_within(word, freq, ideology), y=freq)) +
+  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
+  theme_bw() +
+  coord_flip() +
+  facet_wrap(~ideology, scales = "free") +
+  ggtitle('Word frequencies by ideology') +
+  scale_x_reordered() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 10, color = 'black'),
+        axis.text.y = element_text(size = 13, color = 'black'),
+        plot.title  = element_text(size = 20, color = 'black'),
+        strip.text.x = element_text(size = 20, color = 'black')) +
+  xlab("") +
+  ylab("")
+
+ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/word_freq.pdf", 
+       width = 32, height = 20, units = "cm")
+  
+
 
 ################################################################################
 # Econ - WF
@@ -99,75 +130,6 @@ lib_df <- CreateWFDF(social, 'lib') %>% filter_all(all_vars(!grepl("’", .)))
 #           rot.per = 0.35,
 #           colors = brewer.pal(8, "Dark2"))
 
-
-bar_left <- ggplot(left_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('economically left') 
-
-bar_econ_center <- ggplot(econ_center_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('economically centrist') 
-
-bar_right <- ggplot(right_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('economically right') 
-
-(bar_left + bar_econ_center + bar_right)+ 
-  plot_annotation(
-    title = 'Word frequencies by economic ideology',
-  ) &
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        axis.text.y = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/econ_word_freq.pdf", 
-       width = 32, height = 20, units = "cm")
-
-
-bar_lib <- ggplot(lib_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('socially libertarian') 
-
-bar_social_center <- ggplot(social_center_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('socially centrist') 
-
-bar_auth <- ggplot(auth_df[1:20,], aes(x=reorder(factor(word), freq), freq)) +     
-  geom_col(position = 'dodge', color = 'black', fill = 'cyan') +
-  xlab('') +
-  ylab('') +
-  theme_bw() +
-  coord_flip() +
-  ggtitle('socially authoritarian') 
-
-(bar_lib + bar_social_center + bar_auth)+ 
-  plot_annotation(
-    title = 'Word frequencies by social ideology',
-  ) &
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        axis.text.y = element_text(color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/social_word_freq.pdf", 
-       width = 32, height = 20, units = "cm")
 
 
 ################################################################################
@@ -238,10 +200,10 @@ col_econ <- ggplot(arrange(word_freq_econ, desc(freq))[c(1:20,(6470-20):6470),],
 wc_econ_right <- arrange(word_freq_econ, desc(freq_r))[1:200,] %>% 
   ggplot(aes(label = word, size = freq_r^0.5, color = freq_r)) +
   geom_text_wordcloud_area(rm_outside = TRUE,
-                          max_steps = 1,
-                          grid_size = 1, 
-                          eccentricity = .9,
-                          seed = 0) +
+                           max_steps = 1,
+                           grid_size = 1, 
+                           eccentricity = .9,
+                           seed = 0) +
   theme_minimal() +
   scale_color_gradient(low = "cyan", high = "magenta") + 
   ggtitle('right wing')
@@ -325,5 +287,4 @@ wc_social_lib <- arrange(word_freq_social, desc(freq_l))[1:200,] %>%
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/tf_idf_social.pdf", 
        width = 32, height = 32, units = "cm")
-
 

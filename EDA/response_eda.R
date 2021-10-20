@@ -48,8 +48,8 @@ prop.table(table(reorder_size(user_flair$flair))) %>% t() %>%
 # create chart for frequency
 freq_ideology_barchart  <- ggplot(user_flair, aes(x = reorder_size(flair))) +
   geom_bar(fill = 'cyan',color='black') +
-  xlab("Ideology") +
-  ylab('Frequency')  +
+  xlab("ideology") +
+  ylab('frequency')  +
   theme_bw() +
   plot_annotation(
     title = 'Frequency of ideology',

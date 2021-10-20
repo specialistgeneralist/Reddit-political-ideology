@@ -55,7 +55,6 @@ freq_ideology_barchart  <- ggplot(user_flair, aes(x = reorder_size(flair))) +
     title = 'Frequency of ideology',
   ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
-        text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
+        text = element_text( size = 20, color = 'black'))
 ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/response_freq.pdf", 
        width = 32, height = 20, units = "cm")
-

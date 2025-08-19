@@ -1,7 +1,6 @@
 # NOTE: this is now defunct - data_manipulator_complete.py has assumed the function of this script
 
 library(tidyverse)
-setwd('~/Desktop/WORK/Monash/Thesis/Data collection')
 
 user_records <- read_csv('user_records.csv') %>% filter(subreddit != 'PoliticalCompassMemes')
 

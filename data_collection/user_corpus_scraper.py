@@ -9,7 +9,7 @@ Created on Sun Jul 18 14:20:19 2021
 import pandas as pd 
 from pmaw import PushshiftAPI
 
-user_flair = pd.read_csv('~/Desktop/Michael Honours Stuff/user_flair.csv')
+user_flair = pd.read_csv('user_flair.csv')
 user_flair.index = user_flair['user']
 
 api = PushshiftAPI()
@@ -21,7 +21,7 @@ def UserData(user):
     comments_df['flair'] = user_flair.loc[user,'flair']
     
     user_corpus = pd.DataFrame(comments_df,  columns=['author','body','subreddit','flair'])
-    user_corpus.to_csv('~/Desktop/Michael Honours Stuff/user_corpus.csv', mode='a', index=False, header=False)
+    user_corpus.to_csv('user_corpus.csv', mode='a', index=False, header=False)
  
 counter=1
 for user in user_flair['user']:

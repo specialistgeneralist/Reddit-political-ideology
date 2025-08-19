@@ -5,7 +5,7 @@ from sklearn.preprocessing import Binarizer
 
 
 # Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+data = pd.read_parquet('user-interaction.parquet')
 
 # Recode flairs
 data.replace(':CENTG: - Centrist','centrist', inplace=True)
@@ -46,7 +46,7 @@ grouped_data_row = grouped_data.div(grouped_data.sum(axis=1), axis=0)
 grouped_data_row = grouped_data_row.reindex(['authleft', 'left', 'libleft', 'libcenter', 'centrist', 'authcenter', 'libright', 'right', 'authright'])
 
 # Export to parquet
-grouped_data_row.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/eda_prop.parquet')
+grouped_data_row.to_parquet('eda_prop.parquet')
 
 ################################################################################
 #   Distribution of comments per ideology
@@ -61,4 +61,4 @@ subreddits = ['user.flair','depression','Anxiety','OCD','bipolar','Bitcoin','wal
 data = data[subreddits]
 
 # Export to parquet 
-data.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/eda_dist.parquet')
+data.to_parquet('eda_dist.parquet')

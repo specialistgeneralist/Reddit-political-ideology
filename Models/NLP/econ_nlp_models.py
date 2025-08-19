@@ -54,7 +54,7 @@ custom_cv = StratifiedShuffleSplit(test_size = 0.2, n_splits = 1, random_state =
 ################################################################################
 ################################################################################
 
-clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+clean_data = pd.read_csv('nlp_cleaned_data.csv')
 
 # clean_data = clean_data[clean_data['user.flair'] != ':CENTG: - Centrist']
 # clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Centrist']
@@ -157,7 +157,7 @@ del clean_data
 # glove_vectors = gensim.downloader.load('glove-twitter-200')
 # gensim.downloader.load('word2vec-google-news-300')
 
-data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
+data = pd.read_csv('nlp_concat_data.csv')
 
 # data = data[data['user.flair'] != ':CENTG: - Centrist']
 # data = data[data['user.flair'] != ':centrist: - Centrist']
@@ -239,8 +239,8 @@ del data
 ################################################################################
 ################################################################################
 
-data = pd.read_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
-clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+data = pd.read_csv('nlp_concat_data.csv')
+clean_data = pd.read_csv('nlp_cleaned_data.csv')
 
 comb_data = pd.merge(clean_data, data, on='user')
 comb_data.drop(['user.flair_y', 'Unnamed: 0_x', 'Unnamed: 0_y'],axis=1, inplace = True)
@@ -344,7 +344,7 @@ results = pd.concat([acc_df, model_df])
 results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
-results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_nlp_results.csv')
+results.to_csv('econ_nlp_results.csv')
 
 
 

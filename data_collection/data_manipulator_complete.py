@@ -12,7 +12,8 @@ import pandas as pd
 import numpy as np
 
 # load user-history data 
-user_records = pd.read_csv("/Users/pkitc/Desktop/Michael/Thesis/data/user_records_complete.csv")
+# user_records = pd.read_csv("user_records_complete.csv")
+user_records = pd.read_csv("user_records_data.csv")
 # create frequency column
 user_records['freq'] = 1
 # summarise data
@@ -51,7 +52,7 @@ union = union.groupby(union.index).sum()
 union.index.is_unique
 
 # we now load the user_flair and modify it so that it uses usernames as its index
-user_flair = pd.read_csv("/Users/pkitc/Desktop/Michael/Thesis/data/user_flair.csv")
+user_flair = pd.read_csv("user_flair.csv")
 user_flair.index = user_flair['user']
 user_flair.drop('user', inplace=True,axis=1)
 user_flair.rename(columns={"flair":"user.flair"}, inplace = True)
@@ -62,7 +63,7 @@ data = user_flair.join(union, how="inner")
 # remove union and user_flair to free up memory
 del union, user_flair
 
-data.to_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+data.to_parquet('user-interaction.parquet')
 
 ##############################################################################
 #                           END OF SCRIPT

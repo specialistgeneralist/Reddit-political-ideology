@@ -11,8 +11,8 @@ import pandas as pd
 
 # authenticate 
 reddit = praw.Reddit(
-    client_id='UWy7KqSIIbRZFg', 
-    client_secret='fk9U_vzAwJdp4J2qouixpR-97mI',
+    client_id='XXXX', 
+    client_secret='YYYY',
     user_agent='scrape dawg'
     )
 

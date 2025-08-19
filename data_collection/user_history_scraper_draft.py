@@ -13,8 +13,8 @@ import prawcore
 
 # authenticate 
 reddit = praw.Reddit(
-    client_id='UWy7KqSIIbRZFg', 
-    client_secret='fk9U_vzAwJdp4J2qouixpR-97mI',
+    client_id='XXXX', 
+    client_secret='YYYY',
     user_agent='scrape dawg'
     )
 
@@ -82,7 +82,7 @@ user_records_data = pd.DataFrame(columns=['user','interaction', 'title',
 # here we can run the UserData function with various flaired users as the input
 
 # load user flair data to get list of users to scrape
-user_flair = pd.read_csv("/Users/pkitc/Desktop/Michael Honours Stuff/user_flair.csv")
+user_flair = pd.read_csv("user_flair.csv")
 
 # create count variable so we can track progress
 count = 1

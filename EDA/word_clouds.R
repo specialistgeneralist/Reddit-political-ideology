@@ -14,7 +14,7 @@ library(ggplotify)
 # FREQUENCIES
 ################################################################################
 
-data = read_csv('/Volumes/Elements/Text/nlp_concat_data.csv') %>% 
+data = read_csv('nlp_concat_data.csv') %>% 
   select(-X1) %>% 
   mutate(
     `user.flair` = case_when(
@@ -109,7 +109,7 @@ rbind(left_df[1:20,],
   xlab("") +
   ylab("")
 
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/word_freq.pdf", 
+ggsave("word_freq.pdf", 
        width = 32, height = 20, units = "cm")
   
 
@@ -117,7 +117,7 @@ ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/word_freq.pdf",
 # WORDCLOUD
 ################################################################################
 
-raw_data <- read_csv('/Volumes/Elements/Text/tf_idf_matrix.csv')
+raw_data <- read_csv('tf_idf_matrix.csv')
 
 data <- raw_data %>% 
   mutate(
@@ -221,5 +221,5 @@ p4 <- as.ggplot(grid.grab()) + ggtitle("social - lib") + theme(plot.title = elem
   ) &
   theme(
         text = element_text(size = 20, color = 'black'))
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/wordclouds.pdf", 
+ggsave("wordclouds.pdf", 
        width = 40, height = 40, units = "cm")

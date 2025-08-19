@@ -3,9 +3,6 @@ library(viridis)
 library(kableExtra)
 library(patchwork)
 
-# set working directory
-setwd('~/Desktop/WORK/Monash/Thesis/Data collection/Complete Data')
-
 # load  data
 user_flair <- read_csv('user_flair.csv') 
 
@@ -56,5 +53,5 @@ freq_ideology_barchart  <- ggplot(user_flair, aes(x = reorder_size(flair))) +
   ) &
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text( size = 20, color = 'black'))
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/response_freq.pdf", 
+ggsave("response_freq.pdf", 
        width = 32, height = 20, units = "cm")

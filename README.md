@@ -1,11 +1,20 @@
-# RedditIdeology-Honours2021
-Files for scraping and modeling reddit users' ideologies as a function of digital footprints.
+# Predicting Political Ideology from Digital Footprints 👣
 
-Any file in this repo that is not mentioned in the below list is obsolete and was not used in the final project.
+This repository contains codes to support the paper ([preprint](https://arxiv.org/abs/2206.00397) available at arXiv):
+
+&#x1F4D3; _Predicting Political Ideology from Digital Footprints_
+
+&#x1F58B; By Michael Kitchener, Nandini Anantharama, [Simon D. Angus (Monash)](https://research.monash.edu/en/persons/simon-angus), and [Paul A. Raschky (Monash)](https://research.monash.edu/en/persons/paul-raschky)
+
+## Requirements
+
+The main tools used for this codebase are **R** and **python**. To access the Reddit API you will need to bring your own credentials (replace `XXXX` and `YYYY` as appropriate in the related files).
+
+# File Structure
 
 ## Data Collection
 
-1. *user_flair_scraper_draft.py* this script goes through the Political Compass Memes subreddit and records the flair and usernames of flaired users who have commented in the top 1000 most popular posts, it gives us our list of username and associated ideolog.
+1. *user_flair_scraper_draft.py* this script goes through the Political Compass Memes subreddit and records the flair and usernames of flaired users who have commented in the top 1000 most popular posts, it gives us our list of username and associated ideology.
 2. *user_history_scraper_draft.py* this script loops through each username in the list of usernames and ideologies produced by user_flair_scraper_draft.py and logs the ammount of times each user has posted or commented in a specific subreddit.
 3. *data_manipulator_complete.py* this script pivots the data file produced by user_history_scraper_draft.py so that each row represents a user, each column a subreddit and each cell how much the relevant user comments/posts in the relevant subreddit, we merge this with our list of users and flairs so that we have a complete data set that can be use for prediction.
 4. *user_corpus_scraper.py* this script goes loops through each username in the list of usernames and ideologies produced by user_flair_scraper_draft.py and records the textual content of (a maximum of) 100 comments from each user (with the additional criterion that the comments not be made in the Political Compass Memes subreddit). We process this data to gain features to use in the NLP based models.
@@ -65,17 +74,21 @@ Any file in this repo that is not mentioned in the below list is obsolete and wa
 4. *result_int_viz.R* this script takes the all_int_results.csv, econ_int_results.csv, and social_int_results.csv files and produces graphics illustrating the predictive performance of all the models developed in all_class_int_models.py, econ_class_int_models.py and social_class_int_models.py.
 5. *create_svd_data.py* this script just computes the SVD components of the training set for user-interaction matrix models and exports them to csv so that I can create plots in R showing the data in SVD space
 6. *create_tf_idf_viz_data.py* this script computes the tf-idf scores for different words used by users in their comments and exports this dataframe to a csv so I can create plots showing the frequency of different words in R
-7. *response_eda.py* this script creates a plot of the proportion of each ideological class in our data set
+7. *ideological_freq_viz.py* this script creates a plot of the proportion of each ideological class in our data set
 8. *svd_viz.R* this script creates plots of the data in SVD component space
 9. *word_clouds.R* this script creates plots of word frequncy and various word clouds
 
-## Write up
 
-This folder contains notes to myself that represent intermediate progress on the final write up and is not relevant to the final thesis.
-
-## Proposal
-
-This folder contains some files used in the project proposal and project presentation in semester 1 and are not relevant to the final thesis.
-
-
-
+# Cite
+Please cite the pre-print [available](https://arxiv.org/abs/2206.00397) at arXiv.
+```
+@misc{kitchener2022predictingpoliticalideologydigital,
+      title={Predicting Political Ideology from Digital Footprints}, 
+      author={Michael Kitchener and Nandini Anantharama and Simon D. Angus and Paul A. Raschky},
+      year={2022},
+      eprint={2206.00397},
+      archivePrefix={arXiv},
+      primaryClass={econ.GN},
+      url={https://arxiv.org/abs/2206.00397}, 
+}
+```

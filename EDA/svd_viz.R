@@ -1,7 +1,7 @@
 library(tidyverse)
 library(patchwork)
 
-data <- read_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_data.csv') %>% 
+data <- read_csv('svd_data.csv') %>% 
   select(-X1) %>%
   mutate(
     econ = case_when(
@@ -98,7 +98,7 @@ p9 <- data %>%
         legend.position = "None",
         text = element_text(size = 16, color = 'black'))
 
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/econ_svd_9.pdf", 
+ggsave("econ_svd_9.pdf", 
        width = 32, height = 32, units = "cm")
 
 p3 + 
@@ -112,7 +112,7 @@ p3 +
         legend.position = "None",
         text = element_text(size = 20, color = 'black'))
 
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/svd_scatterplot.pdf", 
+ggsave("svd_scatterplot.pdf", 
        width = 32, height = 20, units = "cm")
 
 #################################################################################
@@ -182,5 +182,5 @@ p9 <- data %>%
         text = element_text(size = 16, color = 'black'))
 
 
-ggsave("/Users/pkitc/Desktop/Michael/Thesis/Viz/social_svd_9.pdf", 
+ggsave("social_svd_9.pdf", 
        width = 32, height = 32, units = "cm")

@@ -14,14 +14,16 @@ from sklearn.preprocessing import Binarizer
 import matplotlib.pyplot as plt
 
 # Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+data = pd.read_parquet('user-interaction.parquet')
 
 # Remove explicitly political columns
 political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
                   'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
                   'republicans', 'conservatives']
-data.drop(columns = political_subs, inplace = True)
-
+# .. drop these if they exist
+for col in political_subs:
+    if col in data.columns:
+        data.drop(columns=[col], inplace=True)
 
 # Remove columns with insufficient interaction 
 # This loop will remove subreddits with less than 50 comments and users with less than 50 comments until no row
@@ -67,7 +69,7 @@ y.reset_index(drop = True, inplace=True)
 
 # Split data into train andtest sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size = 0.2, 
+                                                    test_size = 0.3, 
                                                     stratify = y,
                                                     random_state = 0)
 y_train.reset_index(drop=True, inplace=True)
@@ -79,11 +81,11 @@ binarizer.fit(X_train)
 X_train = binarizer.transform(X_train)
 
 # Compute the first 500 SVD components 
-svd = TruncatedSVD(n_components = 500, random_state = 0)
+svd = TruncatedSVD(n_components = 10, random_state = 0)
 svd.fit(X_train)
 X_train = svd.transform(X_train)
 
 data = pd.concat([y_train, pd.DataFrame(X_train)], axis=1)
-data.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_data.csv')
+data.to_csv('svd_data.csv')
 
 

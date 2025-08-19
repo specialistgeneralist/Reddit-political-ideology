@@ -14,7 +14,7 @@ from sklearn.preprocessing import Binarizer
 import matplotlib.pyplot as plt
 
 # Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+data = pd.read_parquet('user-interaction.parquet')
 
 # Remove explicitly political columns
 political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
@@ -141,7 +141,7 @@ plt.title('No. SVD components and accuracy')
 plt.xlabel('K components')
 plt.ylabel('Accuracy')
 plt.grid(True)
-plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/k_svd_acc.pdf', dpi=600)
+plt.savefig('k_svd_acc.pdf', dpi=600)
 plt.show()
 
 plt.plot(k_components, auc, color='blue')
@@ -149,7 +149,7 @@ plt.title('No. SVD components and weighted AUC')
 plt.xlabel('K components')
 plt.ylabel('ROC-AUC')
 plt.grid(True)
-plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/k_svd_auc.pdf', dpi=600)
+plt.savefig('k_svd_auc.pdf', dpi=600)
 plt.show()
 
 ###############################################################################
@@ -200,7 +200,7 @@ svd_k = pd.concat([
     pd.concat([svd_10.head(10), svd_10.tail(10)]).reset_index(drop=True)], axis=1)
 
 
-svd_k.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/svd_k.csv')
+svd_k.to_csv('svd_k.csv')
 
 ovr_logreg.fit(X_train[:,0:10], y_train)
 svd_coef = pd.DataFrame(ovr_logreg.coef_)
@@ -236,7 +236,7 @@ plt.scatter(x=X_train[:,4],
 plt.xlabel('SVD component 5')
 plt.ylabel('SVD component 6') 
 plt.title('Leftwing (red), rightwing (blue) and centrist (grey) users')
-plt.savefig('/Users/pkitc/Desktop/Michael/Thesis/data/svd_scatterplot', dpi=600)
+plt.savefig('svd_scatterplot', dpi=600)
 plt.show()
 
 

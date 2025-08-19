@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 # nltk.download('stopwords')
 
 # Load data
-data = pd.read_csv('/Volumes/Elements/Text/user_corpus.csv')
+data = pd.read_csv('user_corpus.csv')
 data.columns = ['user', 'comment', 'subreddit', 'user.flair']
 
 # Ensure all comments are strings and remove any rows that have no comment recorded
@@ -62,7 +62,7 @@ meta_data_df2.set_index('user')
 metadata = pd.concat([meta_data_df1, meta_data_df2], axis=1, join='inner')
 
 # Export cleaned meta data to csv to use in modelling
-metadata.to_csv('/Volumes/Elements/Text/nlp_metadata.csv')
+metadata.to_csv('nlp_metadata.csv')
 
 del meta_data_df1, meta_data_df2, metadata
 
@@ -96,7 +96,7 @@ data_grouped = data.groupby(['user', 'user.flair'])['comment'].apply(' '.join).r
 data_grouped['comment'] = data_grouped['comment'].apply(CleanText)
 
 # Export cleaned data to a csv to use in models
-data_grouped.to_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+data_grouped.to_csv('nlp_cleaned_data.csv')
 
 del data_grouped
 
@@ -108,6 +108,6 @@ del data_grouped
 data_grouped = data.groupby(['user', 'user.flair'])['comment'].apply(' '.join).reset_index()
 
 # Export cleaned data to a csv to use in models
-data_grouped.to_csv('/Volumes/Elements/Text/nlp_concat_data.csv')
+data_grouped.to_csv('nlp_concat_data.csv')
 
 

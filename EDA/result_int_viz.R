@@ -1,8 +1,6 @@
 library(tidyverse)
 library(patchwork)
 
-setwd('/Users/michaelkitchener/Desktop/WORK/Monash/Thesis/results/')
-
 all_class <- read_csv('all_int_results.csv') %>%
   rename(model_name = X1)
 all_class <- as_tibble(cbind(nms = colnames(all_class ), t(all_class)))
@@ -129,7 +127,7 @@ p4 <- econ_class %>% filter(model_name != 'Zero R') %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/econ_int_acc_auc.pdf", 
+ggsave("econ_int_acc_auc.pdf", 
        width = 32, height = 20, units = "cm")
 
 # **************************** social user int *****************************
@@ -160,5 +158,5 @@ p6 <- social_class %>% filter(model_name != 'Zero R') %>%
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1,  color = 'black'),
         text = element_text(family = 'serif', face =  'bold', size = 20, color = 'black'))
 
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/social_int_acc_auc.pdf", 
+ggsave("social_int_acc_auc.pdf", 
        width = 32, height = 20, units = "cm")

@@ -19,7 +19,7 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.compose import make_column_selector as selector
 
 # Load TF-IDF data 
-clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+clean_data = pd.read_csv('nlp_cleaned_data.csv')
 
 clean_data = clean_data[clean_data['user.flair'] != ':CENTG: - Centrist']
 clean_data = clean_data[clean_data['user.flair'] != ':centrist: - Centrist']
@@ -30,7 +30,7 @@ clean_data = clean_data[clean_data['user.flair'] != ':lib: - LibCenter']
 clean_data.drop(['Unnamed: 0'], axis=1, inplace=True)
 
 # Load user interaction data 
-int_data = pd.read_parquet('/Volumes/Elements/First_scrape/user-interaction.parquet')
+int_data = pd.read_parquet('user-interaction.parquet')
 political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
                   'Liberal', 'Republican', 'Liberty', 'Labour', 'Marxism', 'Capitalism', 'Anarchist',
                   'republicans', 'conservatives']
@@ -266,7 +266,7 @@ results = pd.concat([acc_df, auc_df, model_df])
 results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
-results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/Binary_econ_comb_results.csv')
+results.to_csv('Binary_econ_comb_results.csv')
 
 
 

@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-clean_data = pd.read_csv('/Volumes/Elements/Text/nlp_cleaned_data.csv')
+clean_data = pd.read_csv('nlp_cleaned_data.csv')
 
 # Recode flair labels to avoid doubling up on flairs 
 clean_data.replace(':CENTG: - Centrist','centrist', inplace=True)
@@ -44,4 +44,4 @@ matrix = tf_idf_vec.transform(X)
 df = pd.DataFrame(matrix.toarray(), columns = tf_idf_vec.get_feature_names())
 
 df = pd.concat([y, df], axis=1)
-df.to_csv('/Volumes/Elements/Text/tf_idf_matrix.csv')
+df.to_csv('tf_idf_matrix.csv')

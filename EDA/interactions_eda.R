@@ -3,7 +3,7 @@ library(patchwork)
 library(arrow)
 library(tidytext) 
 
-data <- read_parquet('~/Desktop/WORK/Monash/Thesis/Data collection/Complete Data/eda_prop.parquet')
+data <- read_parquet('eda_prop.parquet')
 
 ################################################################################
 # Barplots
@@ -38,5 +38,5 @@ data %>%
   xlab("") +
   ylab("")
 
-ggsave("~/Desktop/WORK/Monash/Thesis/Data collection/EDA/interactions_eda.pdf", 
+ggsave("interactions_eda.pdf", 
        width = 32, height = 40, units = "cm")

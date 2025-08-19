@@ -16,7 +16,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score, make_scorer
 from sklearn.preprocessing import Binarizer
 
 # Load data
-data = pd.read_parquet('/Users/pkitc/Desktop/Michael/Thesis/data/user-interaction.parquet')
+data = pd.read_parquet('user-interaction.parquet')
 
 # Remove explicitly political columns
 political_subs = ['Libertarian', 'Anarchism', 'socialism', 'progressive', 'Conservative', 'democrats',
@@ -455,4 +455,4 @@ results = pd.concat([acc_df, auc_df, model_df])
 results.sort_values('accuracy', axis = 1, ascending = True, inplace = True)
 
 # Export this dataframe (which contains each optimized models exact specification, accuracy and auc on the test set) to a .csv
-results.to_csv('/Users/pkitc/Desktop/Michael/Thesis/data/results/econ_int_results.csv')
+results.to_csv('econ_int_results.csv')

@@ -69,7 +69,7 @@ y.reset_index(drop = True, inplace=True)
 
 # Split data into train andtest sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                    test_size = 0.3, 
+                                                    test_size = 0.2, 
                                                     stratify = y,
                                                     random_state = 0)
 y_train.reset_index(drop=True, inplace=True)
@@ -81,7 +81,7 @@ binarizer.fit(X_train)
 X_train = binarizer.transform(X_train)
 
 # Compute the first 500 SVD components 
-svd = TruncatedSVD(n_components = 10, random_state = 0)
+svd = TruncatedSVD(n_components = 500, random_state = 0)
 svd.fit(X_train)
 X_train = svd.transform(X_train)
 
